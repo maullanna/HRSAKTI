@@ -17,7 +17,7 @@
     </div>
 @endsection
 @section('button')
-    <a href="attendance/assign" class="btn btn-primary btn-sm btn-flat"><i class="mdi mdi-plus mr-2"></i>Add New</a>
+    {{-- Attendance is automatically recorded, no manual add button needed --}}
 @endsection
 
 @section('content')

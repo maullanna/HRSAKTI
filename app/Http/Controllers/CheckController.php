@@ -70,7 +70,7 @@ class CheckController extends Controller
                 }
             }
         }
-        flash()->success('Success', 'You have successfully submited the attendance !');
+        // Flash message will be handled by redirect
         return back();
     }
     public function sheetReport()

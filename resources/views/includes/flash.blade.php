@@ -13,6 +13,18 @@ timer: 2500,
 
 @endif
 
+@if (session()->has('success'))
+<script>
+    swal({
+        title: "Success!",
+        text: "{{ session('success') }}",
+        icon: "success",
+        button: true,
+        timer: 3000,
+    });
+</script>
+@endif
+
 @if (session()->has('flash_message_overlay'))
     
 

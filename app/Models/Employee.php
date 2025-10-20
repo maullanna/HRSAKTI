@@ -5,18 +5,19 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Foundation\Auth\User as Authenticatable;
 
-class Employee extends Model
+class Employee extends Authenticatable
 {
     use HasFactory, Notifiable;
     
     public function getRouteKeyName()
     {
-        return 'name';
+        return 'id';
     }
     protected $table = 'employees';
     protected $fillable = [
-        'name', 'email', 'pin_code'
+        'name', 'employee_code', 'nik', 'tanggal_lahir', 'pendidikan', 'kontrak_kerja', 'position', 'email', 'pin_code', 'phone', 'address', 'basic_salary', 'hire_date', 'status', 'role_id', 'section_id', 'wadir_id'
     ];
 
   
@@ -51,7 +52,29 @@ class Employee extends Model
         return $this->belongsToMany('App\Models\Schedule', 'schedule_employees', 'emp_id', 'schedule_id');
     }
 
+    /**
+     * Get the password for the user.
+     * For employee, we use pin_code as password
+     */
+    public function getAuthPassword()
+    {
+        return $this->pin_code;
+    }
 
-    
+    /**
+     * Get the name of the unique identifier for the user.
+     */
+    public function getAuthIdentifierName()
+    {
+        return 'email';
+    }
+
+    /**
+     * Get the unique identifier for the user.
+     */
+    public function getAuthIdentifier()
+    {
+        return $this->{$this->getAuthIdentifierName()};
+    }
 
 }

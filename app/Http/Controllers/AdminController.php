@@ -6,6 +6,7 @@ use App\Models\User;
 use App\Models\Employee;
 use App\Models\Latetime;
 use App\Models\Attendance;
+use Illuminate\Support\Facades\Auth;
 
 
 class AdminController extends Controller
@@ -14,7 +15,13 @@ class AdminController extends Controller
  
     public function index()
     {
-        //Dashboard statistics 
+        // Check if employee is logged in
+        if (Auth::guard('employee')->check()) {
+            $employee = Auth::guard('employee')->user();
+            return view('employee.dashboard', compact('employee'));
+        }
+        
+        //Dashboard statistics for admin
         $totalEmp =  count(Employee::all());
         $AllAttendance = count(Attendance::whereAttendance_date(date("Y-m-d"))->get());
         $ontimeEmp = count(Attendance::whereAttendance_date(date("Y-m-d"))->whereStatus('1')->get());

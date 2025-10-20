@@ -65,6 +65,8 @@ class Kernel extends HttpKernel
         'throttle' => \Illuminate\Routing\Middleware\ThrottleRequests::class,
         'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
         'Role' => \App\Http\Middleware\RoleMiddleware::class,
+        'employee.auth' => \App\Http\Middleware\EmployeeAuth::class,
+        'multi.auth' => \App\Http\Middleware\MultiAuth::class,
     ];
     protected $middlewarePriority = [
         \Illuminate\Session\Middleware\StartSession::class,

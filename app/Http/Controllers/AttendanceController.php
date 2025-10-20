@@ -50,5 +50,7 @@ class AttendanceController extends Controller
         $latetime->latetime_date = date('Y-m-d', strtotime($att_dateTime));
         $latetime->save();
     }
+
+    // Removed assign method as it was causing redirect issues
   
 }

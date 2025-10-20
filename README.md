@@ -1,104 +1,166 @@
-<p align="center"><a href="https://ams.aliatayee.com" target="_blank"><h1>Attendance Management System</h1></a></p>
+# Fingerprint Dashboard
 
-## About Attendance Management System
+Node.js dashboard untuk sistem manajemen kehadiran berbasis fingerprint yang terintegrasi dengan Laravel Attendance Management System.
 
-Attendance Management System is a web application based on Laravel which keeps track of employee hours. It is the system you use to document the time your employees work and the time they take off.
+## Fitur
 
-## Major Technologies
-- HTML5
-- CSS
-- JAVASCRIPT
-- BOOTSTRAP
-- PHP
-- LARAVEL
+- 📊 Dashboard real-time untuk monitoring kehadiran
+- 🔗 Integrasi dengan mesin fingerprint
+- 📈 Statistik dan laporan kehadiran
+- 🔄 Sinkronisasi data otomatis
+- 📱 API RESTful untuk frontend
+- 🔐 Sistem autentikasi dan otorisasi
+- 📊 Chart dan visualisasi data
 
-## Demo
-<a href="http://ams.alihost.co">Demo link</a> 
-
-  ### Admin credential
-    username:ali@aliatayee.com
-    password:ali123
-
-
-### Install & Setup
-
-To setup and install Attendance Management System project, follow the below steps:
-- Clone this project by the command: 
+## Struktur Proyek
 
 ```
-$ git clone https://github.com/aliatayee/Attendance_Management_System
+fingerprint-dashboard/
+├── src/
+│   ├── controllers/          # Controller untuk handling request
+│   │   ├── fingerprintController.js
+│   │   ├── attendanceController.js
+│   │   └── dashboardController.js
+│   ├── middleware/           # Custom middleware
+│   │   ├── errorHandler.js
+│   │   └── fingerprintMiddleware.js
+│   ├── routes/              # Route definitions
+│   │   ├── fingerprint.js
+│   │   ├── attendance.js
+│   │   └── dashboard.js
+│   └── app.js               # Main application file
+├── config/
+│   └── database.js          # Database configuration
+├── public/                  # Static files
+├── views/                   # Template files
+├── routes/                  # Additional routes
+├── middleware/              # Additional middleware
+├── package.json
+├── env.example
+└── README.md
 ```
 
-- Then switch to the project folder by the bellow query:
+## Instalasi
 
-```
-$ cd Attendance_Management_System
-```
+1. **Clone atau buat folder proyek**
+   ```bash
+   cd fingerprint-dashboard
+   ```
 
-- Then open ```env``` file and update database credentials.
+2. **Install dependencies**
+   ```bash
+   npm install
+   ```
 
-- Then run the below command to install composer dependencies
+3. **Setup environment variables**
+   ```bash
+   cp env.example .env
+   ```
+   
+   Edit file `.env` dengan konfigurasi yang sesuai:
+   ```env
+   PORT=3001
+   NODE_ENV=development
+   DB_HOST=localhost
+   DB_PORT=3306
+   DB_NAME=attendance_management_system
+   DB_USER=root
+   DB_PASSWORD=
+   FINGERPRINT_DEVICE_IP=192.168.1.100
+   FINGERPRINT_DEVICE_PORT=4370
+   ```
 
-```
-$ composer install
-```
+4. **Jalankan aplikasi**
+   ```bash
+   # Development mode
+   npm run dev
+   
+   # Production mode
+   npm start
+   ```
 
-- Then run the below command to install dependencies
+## API Endpoints
 
-```
-$ npm i
-```
-- Then run the below command to migrate the tables.
+### Health Check
+- `GET /health` - Status aplikasi
 
-```
-$ php artisan migrate 
-```
-- Then run the below command to run seeder.
+### Fingerprint Management
+- `GET /api/fingerprint/devices` - Daftar device fingerprint
+- `POST /api/fingerprint/devices` - Tambah device baru
+- `PUT /api/fingerprint/devices/:id` - Update device
+- `DELETE /api/fingerprint/devices/:id` - Hapus device
+- `POST /api/fingerprint/sync` - Sinkronisasi data fingerprint
+- `GET /api/fingerprint/logs` - Log data fingerprint
 
-```
-$ php artisan db:seed 
-```
+### Attendance Management
+- `GET /api/attendance` - Daftar kehadiran
+- `GET /api/attendance/employee/:id` - Kehadiran per karyawan
+- `GET /api/attendance/date/:date` - Kehadiran per tanggal
+- `GET /api/attendance/stats/daily` - Statistik harian
+- `GET /api/attendance/stats/monthly` - Statistik bulanan
 
-- Finally, run the below command to start the project.
+### Dashboard
+- `GET /api/dashboard/overview` - Overview dashboard
+- `GET /api/dashboard/stats` - Statistik dashboard
+- `GET /api/dashboard/live-attendance` - Kehadiran real-time
+- `GET /api/dashboard/charts/daily-attendance` - Data chart harian
 
-```
-$ php artisan serve
-```
+## Konfigurasi Database
 
-## Screenshots
-![1](https://user-images.githubusercontent.com/74867463/144262662-b7fbe66e-5c4c-46fb-8bab-9cf3121c2032.png)
-![2](https://user-images.githubusercontent.com/74867463/144262668-545c4d8d-8570-4e38-a769-4c26520e366d.png)
-![3](https://user-images.githubusercontent.com/74867463/144262431-32223a06-8c25-49fd-b969-56a4bab697f2.png)
-![4](https://user-images.githubusercontent.com/74867463/144262645-29d4bfa4-c737-4123-8c22-c8c1fd49477e.png)
+Aplikasi ini menggunakan database MySQL yang sama dengan Laravel Attendance Management System. Pastikan:
 
+1. Database `attendance_management_system` sudah ada
+2. Tabel-tabel berikut sudah tersedia:
+   - `users`
+   - `employees`
+   - `attendances`
+   - `schedules`
+   - `finger_devices`
+   - `role_users`
 
-### Prerequisites
-- PHP installed
-- Composer installed
-- IDE to edit and run the code (We use Visual Studio Code 🔥).
-- Git to versionning your work.
+## Integrasi dengan Mesin Fingerprint
 
-### Authors
-👤 **Ali**
+Untuk integrasi dengan mesin fingerprint, Anda perlu:
 
-- GitHub: [@aliatayee](https://github.com/aliatayee)
-- Twitter: [@aqaatayee](https://twitter.com/aqaatayee)
+1. **Konfigurasi IP dan Port** mesin fingerprint di file `.env`
+2. **Implementasi protokol komunikasi** dengan mesin fingerprint
+3. **Setup sinkronisasi data** otomatis
 
+## Development
 
-## 🤝 Contributing
-Contributions, issues, and feature requests are welcome!
+### Scripts yang tersedia:
+- `npm start` - Jalankan aplikasi
+- `npm run dev` - Jalankan dalam mode development dengan nodemon
+- `npm test` - Jalankan test
 
-Feel free to check the [issues page](../../issues/).
+### Struktur Controller:
+- `fingerprintController.js` - Handle operasi fingerprint device
+- `attendanceController.js` - Handle data kehadiran
+- `dashboardController.js` - Handle data dashboard dan statistik
 
-## Show your support
-Give a ⭐️ if you like this project!
+## Dependencies Utama
 
-## Acknowledgments
-- Hat tip to anyone whose code was used
-- Inspiration
-- etc
+- **Express.js** - Web framework
+- **Sequelize** - ORM untuk database
+- **MySQL2** - MySQL driver
+- **Socket.io** - Real-time communication
+- **Moment.js** - Date manipulation
+- **Axios** - HTTP client
+- **CORS** - Cross-origin resource sharing
+- **Helmet** - Security middleware
 
-## Contributing
+## Lisensi
 
-Thank you for considering contributing to the attendance management system!.
+MIT License
 
+## Kontribusi
+
+1. Fork proyek ini
+2. Buat feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit perubahan (`git commit -m 'Add some AmazingFeature'`)
+4. Push ke branch (`git push origin feature/AmazingFeature`)
+5. Buat Pull Request
+
+## Support
+
+Untuk pertanyaan atau dukungan, silakan buat issue di repository ini.

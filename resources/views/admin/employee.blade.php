@@ -45,11 +45,14 @@
                                                     <tr>
                                                         <th data-priority="1">Employee ID</th>
                                                         <th data-priority="2">Name</th>
-                                                        <th data-priority="3">position</th>
-                                                        <th data-priority="4">Email</th>
-                                                        <th data-priority="5">Schedule</th>
-                                                        <th data-priority="6">Member Since</th>
-                                                        <th data-priority="7">Actions</th>
+                                                        <th data-priority="3">NIK</th>
+                                                        <th data-priority="4">Tanggal Lahir</th>
+                                                        <th data-priority="5">Pendidikan</th>
+                                                        <th data-priority="6">Kontrak Kerja</th>
+                                                        <th data-priority="7">Position</th>
+                                                        <th data-priority="8">Email</th>
+                                                        <th data-priority="9">Member Since</th>
+                                                        <th data-priority="10">Actions</th>
                                                      
                                                     </tr>
                                                     </thead>
@@ -59,18 +62,17 @@
                                                         <tr>
                                                             <td>{{$employee->id}}</td>
                                                             <td>{{$employee->name}}</td>
+                                                            <td>{{$employee->nik ?? '-'}}</td>
+                                                            <td>{{$employee->tanggal_lahir ? \Carbon\Carbon::parse($employee->tanggal_lahir)->format('d/m/Y') : '-'}}</td>
+                                                            <td>{{$employee->pendidikan ?? '-'}}</td>
+                                                            <td>{{$employee->kontrak_kerja ?? '-'}}</td>
                                                             <td>{{$employee->position}}</td>
                                                             <td>{{$employee->email}}</td>
-                                                            <td>
-                                                                @if(isset($employee->schedules->first()->slug))
-                                                                {{$employee->schedules->first()->slug}}
-                                                                @endif
-                                                            </td>
                                                             <td>{{$employee->created_at}}</td>
                                                             <td>
                         
-                                                                <a href="#edit{{$employee->name}}" data-toggle="modal" class="btn btn-success btn-sm edit btn-flat"><i class='fa fa-edit'></i> Edit</a>
-                                                                <a href="#delete{{$employee->name}}" data-toggle="modal" class="btn btn-danger btn-sm delete btn-flat"><i class='fa fa-trash'></i> Delete</a>
+                                                                <a href="#edit{{$employee->id}}" data-toggle="modal" class="btn btn-success btn-sm edit btn-flat"><i class='fa fa-edit'></i> Edit</a>
+                                                                <a href="#delete{{$employee->id}}" data-toggle="modal" class="btn btn-danger btn-sm delete btn-flat"><i class='fa fa-trash'></i> Delete</a>
                                                             </td>
                                                         </tr>
                                                         @endforeach
