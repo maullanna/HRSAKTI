@@ -11,7 +11,7 @@ class CheckController extends Controller
 {
     public function index()
     {
-        return view('admin.check')->with(['employees' => Employee::all()]);
+        return view('admin.master-data.employees.check')->with(['employees' => Employee::all()]);
     }
 
     public function CheckStore(Request $request)
@@ -76,6 +76,6 @@ class CheckController extends Controller
     public function sheetReport()
     {
 
-    return view('admin.sheet-report')->with(['employees' => Employee::all()]);
+    return view('admin.attendance-employees.attendance-sheet.index')->with(['employees' => Employee::all()]);
     }
 }

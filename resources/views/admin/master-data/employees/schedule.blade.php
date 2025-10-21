@@ -89,10 +89,10 @@
     </div> <!-- end row -->
 
     @foreach ($schedules as $schedule)
-        @include('includes.edit_delete_schedule')
+        @include('admin.master-data.employees.edit_delete_schedule')
     @endforeach
 
-    @include('includes.add_schedule')
+    {{-- @include('admin.master-data.employees.add_schedule') --}}
 
 @endsection
 

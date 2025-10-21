@@ -11,7 +11,7 @@ class TrainingController extends Controller
     public function index()
     {
         $trainings = Training::with('employee')->get();
-        return view('admin.trainings', compact('trainings'));
+        return view('admin.trainings.index', compact('trainings'));
     }
 
     public function create()

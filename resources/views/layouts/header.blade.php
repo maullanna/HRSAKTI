@@ -3,32 +3,16 @@
 
 <!-- LOGO -->
 <div class="topbar-left">
-    <a href="/" class="logo" style="display: flex; align-items: center; text-decoration: none;">
-        <div style="margin-right: 15px;">
+    <a href="/" class="logo" style="display: flex; align-items: center; text-decoration: none; margin-left: 12px;">
+        <div>
             @if(getSetting('ams_logo_type', 'predefined') === 'upload')
-                <img src="{{ asset(getSetting('ams_logo', 'assets/images/logo.png')) }}" alt="AMS Logo" style="border-bottom-left-radius: 8px; border-bottom-right-radius: 8px; border-top-left-radius: 0; border-top-right-radius: 0; margin-left: 15px; height: 40px; max-width: 60px; object-fit: contain;">
+                <img src="{{ asset(getSetting('ams_logo', 'assets/images/logo.png')) }}" alt="AMS Logo" style="border-radius: 8px; height: 80px; max-width: 300px; object-fit: contain;">
             @else
-                <div style="width: 40px; height: 40px; background: linear-gradient(45deg, #007bff, #0056b3); border-radius: 8px; display: flex; align-items: center; justify-content: center;">
-                    <span style="color: white; font-weight: bold; font-size: 18px;">A</span>
+                <div style="width: 80px; height: 80px; background: linear-gradient(45deg, #007bff, #0056b3); border-radius: 8px; display: flex; align-items: center; justify-content: center;">
+                    <span style="color: white; font-weight: bold; font-size: 36px;">A</span>
                 </div>
             @endif
         </div>
-        <div>
-            <h1 style="
-                color: white; 
-                margin: 0; 
-                font-size: 28px; 
-                font-weight: 700; 
-                letter-spacing: 1.5px; 
-                font-family: 'sans-serif;
-                text-shadow: 1px 2px 8px rgba(0,0,0,0.18), 0 1px 0 #0056b3;
-                ">
-                {{ getSetting('ams_name', 'AMS') }}
-            </h1>
-        </div>
-        <!-- Optionally, include Google Fonts for Poppins/Montserrat in your main layout: 
-        <link href="https://fonts.googleapis.com/css?family=Poppins:700|Montserrat:700&display=swap" rel="stylesheet">
-        -->
     </a>
 </div>
 

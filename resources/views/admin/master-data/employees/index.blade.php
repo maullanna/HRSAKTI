@@ -88,10 +88,10 @@
                                     
 
 @foreach( $employees as $employee)
-@include('includes.edit_delete_employee')
+@include('admin.master-data.employees.edit_delete_employee')
 @endforeach
 
-@include('includes.add_employee')
+@include('admin.master-data.employees.add_employee')
 
 @endsection
 

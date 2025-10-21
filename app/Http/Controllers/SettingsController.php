@@ -10,28 +10,9 @@ class SettingsController extends Controller
 {
     public function index()
     {
-        return view('admin.settings');
+        return view('admin.settings.index');
     }
     
-    public function test()
-    {
-        // Test method to verify settings are working
-        $settings = [
-            'ams_logo' => 'assets/images/logo.png',
-            'ams_logo_type' => 'predefined',
-            'ams_name' => 'Test Company Name - ' . now()->format('H:i:s'),
-            'footer_text' => 'Test Footer from Controller - ' . now(),
-            'footer_show_year' => 1,
-            'footer_show_author' => 1,
-        ];
-        
-        $this->saveSettings($settings);
-        
-        return response()->json([
-            'message' => 'Settings updated successfully',
-            'settings' => $settings
-        ]);
-    }
 
     public function update(Request $request)
     {
@@ -42,10 +23,7 @@ class SettingsController extends Controller
             'ams_logo_type' => 'required|in:predefined,upload',
             'ams_logo' => 'required_if:ams_logo_type,predefined|string',
             'ams_logo_upload' => 'required_if:ams_logo_type,upload|image|mimes:png,jpg,jpeg,svg|max:2048',
-            'ams_name' => 'required|string|max:100',
             'footer_text' => 'required|string|max:1000',
-            'footer_show_year' => 'nullable|boolean',
-            'footer_show_author' => 'nullable|boolean',
         ]);
 
         try {
@@ -53,10 +31,8 @@ class SettingsController extends Controller
             
             // Debug logging
             \Log::info('Settings update request:', $request->all());
-            \Log::info('AMS Name from request:', ['ams_name' => $request->ams_name]);
             
             // AMS Logo settings
-            $settings['ams_name'] = $request->ams_name;
             
             if ($request->ams_logo_type === 'predefined') {
                 $settings['ams_logo'] = $request->ams_logo;
@@ -76,8 +52,6 @@ class SettingsController extends Controller
             
             // Footer settings
             $settings['footer_text'] = $request->footer_text;
-            $settings['footer_show_year'] = (int) $request->footer_show_year;
-            $settings['footer_show_author'] = (int) $request->footer_show_author;
             
             // Debug logging
             \Log::info('Settings to save:', $settings);

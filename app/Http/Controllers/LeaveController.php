@@ -19,13 +19,13 @@ class LeaveController extends Controller
     public function index()
     {
         $leaves = Leave::with('employee')->latest()->get();
-        return view('admin.leave', compact('leaves'));
+        return view('admin.leaves.index', compact('leaves'));
     }
 
     public function create()
     {
         $employees = Employee::all();
-        return view('admin.leave.create', compact('employees'));
+        return view('admin.leaves.create', compact('employees'));
     }
 
     public function store(Request $request)
@@ -55,13 +55,13 @@ class LeaveController extends Controller
     public function show(Leave $leave)
     {
         $leave->load('employee');
-        return view('admin.leave.show', compact('leave'));
+        return view('admin.leaves.show', compact('leave'));
     }
 
     public function edit(Leave $leave)
     {
         $employees = Employee::all();
-        return view('admin.leave.edit', compact('leave', 'employees'));
+        return view('admin.leaves.edit', compact('leave', 'employees'));
     }
 
     public function update(Request $request, Leave $leave)
@@ -110,7 +110,7 @@ class LeaveController extends Controller
 
     public function indexOvertime()
     {
-        return view('admin.overtime')->with(['overtimes' => Overtime::all()]);
+        return view('admin.overtime.index')->with(['overtimes' => Overtime::all()]);
     }
 
     public static function overTimeDevice($att_dateTime, Employee $employee)

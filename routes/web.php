@@ -218,7 +218,6 @@ Route::group(['middleware' => ['multi.auth']], function () {
     Route::group(['middleware' => ['Role:super_admin']], function () {
         Route::get('/settings', '\App\Http\Controllers\SettingsController@index')->name('settings');
         Route::put('/settings', '\App\Http\Controllers\SettingsController@update')->name('settings.update');
-        Route::get('/settings/test', '\App\Http\Controllers\SettingsController@test')->name('settings.test');
         Route::get('/settings/debug', function() {
             return response()->json([
                 'current_settings' => \App\Http\Controllers\SettingsController::getSettings(),
@@ -226,6 +225,9 @@ Route::group(['middleware' => ['multi.auth']], function () {
                 'footer_text' => getFooterText()
             ]);
         })->name('settings.debug');
+        
+        // Admin Management routes
+        Route::resource('/admin-management', '\App\Http\Controllers\AdminManagementController');
         
         Route::post('/settings/test-update', function(\Illuminate\Http\Request $request) {
             $controller = new \App\Http\Controllers\SettingsController();

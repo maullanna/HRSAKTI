@@ -34,7 +34,7 @@
                     </div>
                     
                     <div class="row">
-                        <div class="col-md-6">
+                        <div class="col-12">
                             <div class="form-group">
                                 <label for="ams_logo_type">Logo Type</label>
                                 <select name="ams_logo_type" id="ams_logo_type" class="form-control" onchange="toggleLogoInput()">
@@ -42,14 +42,6 @@
                                     <option value="upload" {{ old('ams_logo_type', getSetting('ams_logo_type', 'predefined')) == 'upload' ? 'selected' : '' }}>Upload custom logo</option>
                                 </select>
                                 <small class="form-text text-muted">Choose how to set the AMS logo</small>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label for="ams_name">AMS Name</label>
-                                <input type="text" name="ams_name" id="ams_name" class="form-control" 
-                                       value="{{ old('ams_name', getSetting('ams_name', 'AMS')) }}" placeholder="Enter AMS name">
-                                <small class="form-text text-muted">Name displayed next to the logo</small>
                             </div>
                         </div>
                     </div>
@@ -76,7 +68,7 @@
                                 <input type="file" name="ams_logo_upload" id="ams_logo_upload" class="form-control-file" accept="image/*">
                                 <small class="form-text text-muted">Upload a custom logo (PNG, JPG, SVG - Max 2MB)</small>
                                 <div id="logo_preview" class="mt-2" style="display: none;">
-                                    <img id="preview_logo" src="" alt="Logo Preview" style="max-width: 120px; max-height: 40px;">
+                                    <img id="preview_logo" src="" alt="Logo Preview" style="max-width: 200px; max-height: 80px; object-fit: contain;">
                                 </div>
                             </div>
                         </div>
@@ -95,31 +87,23 @@
                             <div class="form-group">
                                 <label for="footer_text">Footer Text</label>
                                 <textarea name="footer_text" id="footer_text" class="form-control" rows="3" 
-                                          placeholder="Enter footer text">{{ old('footer_text', getSetting('footer_text', '© 2025 Attendance Management System - Crafted with ❤️ by Ali Aqa Atayee.')) }}</textarea>
-                                <small class="form-text text-muted">Text displayed in the footer of the application</small>
+                                          placeholder="Enter footer text">{{ old('footer_text', getSetting('footer_text', '© {YEAR} Attendance Management System - Crafted with ❤️ by Ali Aqa Atayee.')) }}</textarea>
+                                <small class="form-text text-muted">Text displayed in the footer of the application. Use {YEAR} as placeholder for current year (automatically updated).</small>
+                                <div class="mt-2">
+                                    <strong>Preview:</strong>
+                                    <div id="footer_preview" class="border p-2 bg-light rounded mt-1" style="font-size: 0.9em;">
+                                        {{ getFooterText() }}
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
                     
                     <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label for="footer_show_year">Show Year in Footer</label>
-                                <select name="footer_show_year" id="footer_show_year" class="form-control">
-                                    <option value="1" {{ old('footer_show_year', getSetting('footer_show_year', 1)) == 1 ? 'selected' : '' }}>Yes</option>
-                                    <option value="0" {{ old('footer_show_year', getSetting('footer_show_year', 1)) == 0 ? 'selected' : '' }}>No</option>
-                                </select>
-                                <small class="form-text text-muted">Automatically show current year in footer</small>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label for="footer_show_author">Show Author in Footer</label>
-                                <select name="footer_show_author" id="footer_show_author" class="form-control">
-                                    <option value="1" {{ old('footer_show_author', getSetting('footer_show_author', 1)) == 1 ? 'selected' : '' }}>Yes</option>
-                                    <option value="0" {{ old('footer_show_author', getSetting('footer_show_author', 1)) == 0 ? 'selected' : '' }}>No</option>
-                                </select>
-                                <small class="form-text text-muted">Show author information in footer</small>
+                        <div class="col-12">
+                            <div class="alert alert-info">
+                                <i class="mdi mdi-information mr-2"></i>
+                                <strong>Note:</strong> Year (© 2025) will be automatically added to the beginning of your footer text. You only need to enter the text content.
                             </div>
                         </div>
                     </div>
@@ -193,35 +177,36 @@ document.addEventListener('DOMContentLoaded', function() {
     // Initialize logo input visibility
     toggleLogoInput();
     
+    // Footer preview functionality
+    const footerTextInput = document.getElementById('footer_text');
+    const footerPreview = document.getElementById('footer_preview');
+    
+    function updateFooterPreview() {
+        let previewText = footerTextInput.value;
+        const currentYear = new Date().getFullYear();
+        
+        // Always add year at the beginning
+        let finalText = '© ' + currentYear + ' ' + previewText;
+        
+        // Remove any existing year patterns to avoid duplication
+        finalText = finalText.replace(/©\s*\d{4}\s*/g, '');
+        finalText = '© ' + currentYear + ' ' + finalText.trim();
+        
+        footerPreview.textContent = finalText;
+    }
+    
+    // Add event listeners for real-time preview
+    footerTextInput.addEventListener('input', updateFooterPreview);
+    
+    // Initialize preview
+    updateFooterPreview();
+    
     form.addEventListener('submit', function(e) {
         // Debug: Log form data
         console.log('Form submitted with data:', {
-            ams_name: document.getElementById('ams_name').value,
             ams_logo_type: document.getElementById('ams_logo_type').value,
             footer_text: document.getElementById('footer_text').value
         });
-        
-        // Basic validation
-        const amsName = document.getElementById('ams_name').value.trim();
-        
-        console.log('AMS Name validation:', {
-            value: amsName,
-            length: amsName.length,
-            isEmpty: !amsName,
-            isTooLong: amsName.length > 100
-        });
-        
-        if (!amsName) {
-            e.preventDefault();
-            alert('AMS name is required!');
-            return false;
-        }
-        
-        if (amsName.length > 100) {
-            e.preventDefault();
-            alert('AMS name must be less than 100 characters!');
-            return false;
-        }
         
         console.log('Form validation passed, submitting...');
         

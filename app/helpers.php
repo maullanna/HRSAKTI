@@ -23,8 +23,7 @@ if (!function_exists('getSetting')) {
         $defaults = [
             'ams_logo' => 'assets/images/logo.png',
             'ams_logo_type' => 'predefined',
-            'ams_name' => 'AMS',
-            'footer_text' => '© 2025 Attendance Management System - Crafted with ❤️ by Ali Aqa Atayee.',
+            'footer_text' => 'Attendance Management System',
             'footer_show_year' => 1,
             'footer_show_author' => 1,
         ];
@@ -41,17 +40,16 @@ if (!function_exists('getFooterText')) {
      */
     function getFooterText()
     {
-        $footerText = getSetting('footer_text', '© 2025 Attendance Management System - Crafted with ❤️ by Ali Aqa Atayee.');
+        $footerText = getSetting('footer_text', 'Attendance Management System');
+        $currentYear = date('Y');
         
-        if (getSetting('footer_show_year', 1)) {
-            $currentYear = date('Y');
-            $footerText = str_replace('2025', $currentYear, $footerText);
-        }
+        // Always add year at the beginning, regardless of settings
+        $finalText = '© ' . $currentYear . ' ' . $footerText;
         
-        if (!getSetting('footer_show_author', 1)) {
-            $footerText = preg_replace('/ - Crafted with.*$/', '', $footerText);
-        }
+        // Remove any existing year patterns from the text to avoid duplication
+        $finalText = preg_replace('/©\s*\d{4}\s*/', '', $finalText);
+        $finalText = '© ' . $currentYear . ' ' . trim($finalText);
         
-        return $footerText;
+        return $finalText;
     }
 }

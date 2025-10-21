@@ -35,7 +35,7 @@ class AdminController extends Controller
         
         $data = [$totalEmp, $ontimeEmp, $latetimeEmp, $percentageOntime];
         
-        return view('admin.index')->with(['data' => $data]);
+        return view('admin.dashboard.index')->with(['data' => $data]);
     }
 
 }

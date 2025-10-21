@@ -14,13 +14,13 @@ class AttendanceController extends Controller
     //show attendance 
     public function index()
     {  
-        return view('admin.attendance')->with(['attendances' => Attendance::all()]);
+        return view('admin.attendance-employees.index')->with(['attendances' => Attendance::all()]);
     }
 
     //show late times
     public function indexLatetime()
     {
-        return view('admin.latetime')->with(['latetimes' => Latetime::all()]);
+        return view('admin.attendance-employees.attendance-logs.latetime')->with(['latetimes' => Latetime::all()]);
     }
 
     

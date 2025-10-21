@@ -25,7 +25,7 @@ class ReportController extends Controller
         $overtimes = $query->get();
         $employees = Employee::all();
 
-        return view('admin.reports.overtime', compact('overtimes', 'employees', 'startDate', 'endDate', 'employeeId'));
+        return view('admin.overtime.reports', compact('overtimes', 'employees', 'startDate', 'endDate', 'employeeId'));
     }
 
     public function exportOvertimeReport(Request $request)

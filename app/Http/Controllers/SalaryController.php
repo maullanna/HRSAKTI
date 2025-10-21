@@ -11,7 +11,7 @@ class SalaryController extends Controller
     public function index()
     {
         $salaries = Salary::with('employee')->get();
-        return view('admin.salaries', compact('salaries'));
+        return view('admin.salaries.index', compact('salaries'));
     }
 
     public function create()

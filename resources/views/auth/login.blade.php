@@ -65,9 +65,16 @@
 
                 <div class="form-group">
                     <label for="password">{{ __('Password / PIN Code') }}</label>
-                    <input id="password" type="password" class="form-control @error('password') is-invalid @enderror"
-                        name="password" required autocomplete="current-password" 
-                        placeholder="Enter your password or PIN code">
+                    <div class="input-group">
+                        <input id="password" type="password" class="form-control @error('password') is-invalid @enderror"
+                            name="password" required autocomplete="current-password" 
+                            placeholder="Enter your password or PIN code">
+                        <div class="input-group-append">
+                            <button class="btn btn-outline-secondary" type="button" id="togglePassword">
+                                <i class="mdi mdi-eye" id="togglePasswordIcon"></i>
+                            </button>
+                        </div>
+                    </div>
                     @error('password')
                         <span class="invalid-feedback" role="alert">
                             <strong>{{ $message }}</strong>
@@ -90,6 +97,38 @@
         </div>
     </div>
 </div>
+@endsection
+
+@section('style')
+<style>
+.input-group-append .btn {
+    border-left: 0;
+    border-color: #ced4da;
+    background-color: #f8f9fa;
+    color: #6c757d;
+    transition: all 0.3s ease;
+}
+
+.input-group-append .btn:hover {
+    background-color: #e9ecef;
+    color: #495057;
+    border-color: #ced4da;
+}
+
+.input-group-append .btn:focus {
+    box-shadow: none;
+    border-color: #ced4da;
+}
+
+.input-group .form-control:focus {
+    border-color: #ced4da;
+    box-shadow: none;
+}
+
+.input-group .form-control:focus + .input-group-append .btn {
+    border-color: #ced4da;
+}
+</style>
 @endsection
 
 @section('script')
@@ -164,6 +203,22 @@ document.querySelector('.login-image').addEventListener('mouseenter', function()
 // Resume slideshow when mouse leaves
 document.querySelector('.login-image').addEventListener('mouseleave', function() {
     startSlideshow();
+});
+
+// Toggle password visibility
+document.getElementById('togglePassword').addEventListener('click', function() {
+    const passwordInput = document.getElementById('password');
+    const toggleIcon = document.getElementById('togglePasswordIcon');
+    
+    if (passwordInput.type === 'password') {
+        passwordInput.type = 'text';
+        toggleIcon.classList.remove('mdi-eye');
+        toggleIcon.classList.add('mdi-eye-off');
+    } else {
+        passwordInput.type = 'password';
+        toggleIcon.classList.remove('mdi-eye-off');
+        toggleIcon.classList.add('mdi-eye');
+    }
 });
 </script>
 @endsection

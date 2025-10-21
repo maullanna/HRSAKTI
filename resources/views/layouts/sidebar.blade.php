@@ -61,6 +61,14 @@
                                     <i class="ti-user"></i><span> Employees </span>
                                 </a>
                             </li>
+                            
+                            @if($hasRole(['super_admin']))
+                            <li>
+                                <a href="/admin-management" class="waves-effect {{ request()->is("admin-management") || request()->is("admin-management/*") ? "mm active" : "" }}">
+                                    <i class="mdi mdi-account-supervisor"></i><span> Manajemen Admin </span>
+                                </a>
+                            </li>
+                            @endif
                             @endif
 
                             <!-- Attendance Section - Super Admin, Admin SDM, Wadir, Employee -->
