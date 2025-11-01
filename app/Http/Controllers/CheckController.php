@@ -19,57 +19,32 @@ class CheckController extends Controller
         if (isset($request->attd)) {
             foreach ($request->attd as $keys => $values) {
                 foreach ($values as $key => $value) {
-                    if ($employee = Employee::whereId(request('emp_id'))->first()) {
+                    // Find employee by id_employees
+                    $employee = Employee::where('id_employees', $key)->first();
+                    
+                    if ($employee) {
                         if (
                             !Attendance::whereAttendance_date($keys)
-                                ->whereEmp_id($key)
+                                ->whereEmp_id($employee->id_employees)
                                 ->whereType(0)
                                 ->first()
                         ) {
                             $data = new Attendance();
                             
-                            $data->emp_id = $key;
-                            $emp_req = Employee::whereId($data->emp_id)->first();
-                            $data->attendance_time = date('H:i:s', strtotime($emp_req->schedules->first()->time_in));
+                            $data->emp_id = $employee->id_employees;
+                            $schedule = $employee->schedules->first();
+                            $data->attendance_time = $schedule ? date('H:i:s', strtotime($schedule->time_in)) : date('H:i:s');
                             $data->attendance_date = $keys;
+                            $data->type = 0;
+                            $data->status = 1; // Default on-time, can be updated later
                             
-                            // $emps = date('H:i:s', strtotime($employee->schedules->first()->time_in));
-                            // if (!($emps >= $data->attendance_time)) {
-                            //     $data->status = 0;
-                           
-                            // }
                             $data->save();
                         }
                     }
                 }
             }
         }
-        if (isset($request->leave)) {
-            foreach ($request->leave as $keys => $values) {
-                foreach ($values as $key => $value) {
-                    if ($employee = Employee::whereId(request('emp_id'))->first()) {
-                        if (
-                            !Leave::whereLeave_date($keys)
-                                ->whereEmp_id($key)
-                                ->whereType(1)
-                                ->first()
-                        ) {
-                            $data = new Leave();
-                            $data->emp_id = $key;
-                            $emp_req = Employee::whereId($data->emp_id)->first();
-                            $data->leave_time = $emp_req->schedules->first()->time_out;
-                            $data->leave_date = $keys;
-                            // if ($employee->schedules->first()->time_out <= $data->leave_time) {
-                            //     $data->status = 1;
-                                
-                            // }
-                            // 
-                            $data->save();
-                        }
-                    }
-                }
-            }
-        }
+        // Leave checkbox removed - use Leave menu instead
         // Flash message will be handled by redirect
         return back();
     }

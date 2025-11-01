@@ -24,14 +24,32 @@ class EmployeeRec extends FormRequest
     public function rules()
     {
         $employee = $this->route('employee');
-        $employeeId = $employee ? $employee->id : null;
+        $employeeId = $employee ? $employee->id_employees : null;
         
         return [
             'name' => 'required|string|min:3|max:64',
-            'employee_code' => 'required|string|min:3|max:20|unique:employees,employee_code,' . $employeeId,
-                'position' => 'required|string|in:Wadir 1,Wadir 2,Section Prodi TPMO,Section Prodi TOPKR4,Section BAAK,Section Teaching Factory,Section IT & Sarpras,Section Administrasi,YTI Board of Directors,Employees,Magang,PKL',
-            'email' => 'nullable|email|unique:employees,email,' . $employeeId,
+            'employee_code' => 'required|string|min:3|max:20|unique:employees,employee_code,' . $employeeId . ',id_employees',
+            'position' => 'required|string|in:Wadir 1,Wadir 2,Section Prodi TPMO,Section Prodi TOPKR4,Section BAAK,Section Teaching Factory,Section IT & Sarpras,Section Administrasi,YTI Board of Directors,Employees,Magang,PKL',
+            'email' => 'nullable|email|unique:employees,email,' . $employeeId . ',id_employees',
             'pin_code' => 'nullable|string|min:4|max:10',
+            'nik' => 'nullable|string|max:20',
+            'tanggal_lahir' => 'nullable|date',
+            'pendidikan' => 'nullable|string|in:SD,SMP,SMA/SMK,D1,D2,D3,D4,S1,S2,S3',
+            'kontrak_kerja' => 'nullable|string|in:Tetap,Kontrak,Magang,PKL,Freelance',
+            'kontrak_durasi' => [
+                'nullable',
+                'required_if:kontrak_kerja,Magang,Kontrak,PKL,Freelance',
+                'integer',
+                'min:1',
+                'max:120'
+            ],
+            'hire_date' => [
+                'nullable',
+                'required_if:kontrak_kerja,Magang,Kontrak,PKL,Freelance',
+                'date'
+            ],
+            'phone' => 'nullable|string|max:20',
+            'status' => 'nullable|in:active,inactive',
         ];
     }
 
@@ -56,6 +74,12 @@ class EmployeeRec extends FormRequest
             'email.unique' => 'This email address is already registered.',
             'pin_code.min' => 'PIN code must be at least 4 characters.',
             'pin_code.max' => 'PIN code must not exceed 10 characters.',
+            'hire_date.required' => 'Tanggal mulai kontrak wajib diisi.',
+            'hire_date.date' => 'Format tanggal tidak valid.',
+            'kontrak_durasi.required_if' => 'Durasi kontrak wajib diisi untuk kontrak kerja ini.',
+            'kontrak_durasi.integer' => 'Durasi kontrak harus berupa angka.',
+            'kontrak_durasi.min' => 'Durasi kontrak minimal 1 bulan.',
+            'kontrak_durasi.max' => 'Durasi kontrak maksimal 120 bulan.',
         ];
     }
 }

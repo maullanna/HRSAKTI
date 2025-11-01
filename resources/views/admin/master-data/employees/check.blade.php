@@ -48,12 +48,12 @@
                             @csrf
                             @foreach ($employees as $employee)
 
-                                <input type="hidden" name="emp_id" value="{{ $employee->id }}">
+                                <input type="hidden" name="emp_id" value="{{ $employee->id_employees }}">
 
                                 <tr>
                                     <td>{{ $employee->name }}</td>
                                     <td>{{ $employee->position }}</td>
-                                    <td>{{ $employee->id }}</td>
+                                    <td>{{ $employee->id_employees }}</td>
 
 
 
@@ -68,31 +68,22 @@
                                             $date_picker = \Carbon\Carbon::createFromDate($today->year, $today->month, $i)->format('Y-m-d');
                                             
                                             $check_attd = \App\Models\Attendance::query()
-                                                ->where('emp_id', $employee->id)
+                                                ->where('emp_id', $employee->id_employees)
                                                 ->where('attendance_date', $date_picker)
-                                                ->first();
-                                            
-                                            $check_leave = \App\Models\Leave::query()
-                                                ->where('emp_id', $employee->id)
-                                                ->where('leave_date', $date_picker)
                                                 ->first();
                                             
                                         @endphp
                                         <td>
-
                                             <div class="form-check form-check-inline">
-                                                <input class="form-check-input" id="check_box"
-                                                    name="attd[{{ $date_picker }}][{{ $employee->id }}]" type="checkbox"
-                                                    @if (isset($check_attd))  checked @endif id="inlineCheckbox1" value="1">
-
+                                                <label class="form-check-label">
+                                                    <input class="form-check-input" 
+                                                        name="attd[{{ $date_picker }}][{{ $employee->id_employees }}]" 
+                                                        type="checkbox"
+                                                        @if (isset($check_attd)) checked @endif 
+                                                        value="1">
+                                                    <span class="ml-2">Hadir</span>
+                                                </label>
                                             </div>
-                                            <div class="form-check form-check-inline">
-                                                <input class="form-check-input" id="check_box"
-                                                    name="leave[{{ $date_picker }}][{{ $employee->id }}]]" type="checkbox"
-                                                    @if (isset($check_leave))  checked @endif id="inlineCheckbox2" value="1">
-
-                                            </div>
-
                                         </td>
 
                                     @endfor

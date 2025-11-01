@@ -29,3 +29,6 @@ class Training extends Model
 
 
 
+
+
+

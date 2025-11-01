@@ -17,3 +17,7 @@ use Illuminate\Support\Facades\Route;
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
+
+// Fingerprint Sync API - Called by Node.js service
+Route::post('/fingerprint/sync', [\App\Http\Controllers\Api\FingerprintSyncController::class, 'sync']);
+Route::post('/fingerprint/sync-bulk', [\App\Http\Controllers\Api\FingerprintSyncController::class, 'syncBulk']);

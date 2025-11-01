@@ -18,12 +18,13 @@
   "author": "Your Name",
   "license": "MIT",
   "dependencies": {
-    "mysql2": "^3.6.5",
     "axios": "^1.6.2",
-    "moment": "^2.29.4",
     "dotenv": "^16.3.1",
+    "moment": "^2.29.4",
+    "mysql2": "^3.6.5",
     "node-cron": "^3.0.3",
-    "winston": "^3.11.0"
+    "winston": "^3.11.0",
+    "xml2js": "^0.6.2"
   },
   "devDependencies": {
     "nodemon": "^3.0.2"

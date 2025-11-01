@@ -32,3 +32,6 @@ class Salary extends Model
 
 
 
+
+
+

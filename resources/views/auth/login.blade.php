@@ -94,6 +94,14 @@
                     {{ __('Log In') }}
                 </button>
             </form>
+            
+            <!-- Arrow pointing to Login button -->
+            <div class="login-arrow">
+                <div class="arrow-container">
+                    <i class="mdi mdi-arrow-right"></i>
+                    <span>Click here to login</span>
+                </div>
+            </div>
         </div>
     </div>
 </div>
@@ -127,6 +135,110 @@
 
 .input-group .form-control:focus + .input-group-append .btn {
     border-color: #ced4da;
+}
+
+/* Login Form Positioning */
+.login-form {
+    position: relative;
+}
+
+/* Login Arrow Styling */
+.login-arrow {
+    position: absolute;
+    right: -80px;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 10;
+    animation: bounceArrow 2s infinite;
+}
+
+.arrow-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 15px 20px;
+    border-radius: 25px;
+    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+    position: relative;
+    min-width: 120px;
+}
+
+.arrow-container::before {
+    content: '';
+    position: absolute;
+    left: -10px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 0;
+    height: 0;
+    border-top: 10px solid transparent;
+    border-bottom: 10px solid transparent;
+    border-right: 10px solid #667eea;
+}
+
+.arrow-container i {
+    font-size: 24px;
+    margin-bottom: 5px;
+    animation: pulse 1.5s infinite;
+}
+
+.arrow-container span {
+    font-size: 12px;
+    font-weight: 600;
+    text-align: center;
+    line-height: 1.2;
+}
+
+@keyframes bounceArrow {
+    0%, 20%, 50%, 80%, 100% {
+        transform: translateY(-50%);
+    }
+    40% {
+        transform: translateY(-60%);
+    }
+    60% {
+        transform: translateY(-55%);
+    }
+}
+
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.1);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+/* Responsive adjustments */
+@media (max-width: 1200px) {
+    .login-arrow {
+        right: -60px;
+    }
+    
+    .arrow-container {
+        padding: 12px 16px;
+        min-width: 100px;
+    }
+    
+    .arrow-container i {
+        font-size: 20px;
+    }
+    
+    .arrow-container span {
+        font-size: 11px;
+    }
+}
+
+@media (max-width: 768px) {
+    .login-arrow {
+        display: none;
+    }
 }
 </style>
 @endsection

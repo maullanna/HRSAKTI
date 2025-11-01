@@ -1,63 +1,44 @@
-# Node.js Fingerprint Service
+# Node.js Fingerprint Sync Service
 
-Service Node.js untuk mengambil data log dari mesin fingerprint dan menyinkronkannya dengan database Laravel Attendance Management System.
+Service Node.js untuk mengambil data log dari mesin fingerprint Solution X401 dan menyinkronkannya dengan Laravel Attendance Management System melalui API.
 
-## Fitur
+## 🎯 Fitur
 
-- 🔄 Sinkronisasi otomatis dengan mesin fingerprint
-- 📊 Pengambilan data log kehadiran
-- 🗄️ Integrasi dengan database MySQL Laravel
-- ⏰ Sinkronisasi terjadwal (cron job)
-- 📝 Logging lengkap untuk monitoring
-- 🔧 Konfigurasi mudah melalui file .env
+- ✅ Pull data attendance dari fingerprint device via SOAP Web Service
+- ✅ Parse XML response dari fingerprint device
+- ✅ Send data ke Laravel API endpoint
+- ✅ Auto-sync setiap 5 detik (real-time)
+- ✅ Error handling & retry logic
+- ✅ Logging lengkap untuk monitoring
+- ✅ Duplicate detection
+- ✅ Connection testing untuk fingerprint & Laravel API
 
-## Struktur Proyek
+## 📋 Requirements
 
-```
-node-fingerprint/
-├── index.js          # File utama service
-├── package.json      # Dependencies Node.js
-├── .env             # Konfigurasi environment
-├── env.example      # Template konfigurasi
-└── README.md        # Dokumentasi
-```
+- Node.js >= 16.0.0
+- Koneksi network ke fingerprint device (192.168.0.201)
+- Koneksi internet untuk POST ke Laravel API
+- Laravel API endpoint accessible
 
-## Instalasi
+## 🚀 Installation
 
-1. **Masuk ke folder node-fingerprint**
-   ```bash
-   cd node-fingerprint
-   ```
-
-2. **Install dependencies**
+1. **Install dependencies**
    ```bash
    npm install
    ```
 
-3. **Setup konfigurasi**
+2. **Setup configuration**
    ```bash
-   copy env.example .env
-   ```
+   # Copy env.example ke .env
+   cp env.example .env
    
-   Edit file `.env` dengan konfigurasi yang sesuai:
-   ```env
-   # Database Configuration
-   DB_HOST=localhost
-   DB_PORT=3306
-   DB_NAME=attendance_management_system
-   DB_USER=root
-   DB_PASSWORD=
-
-   # Fingerprint Device Configuration
-   FINGERPRINT_DEVICE_IP=192.168.1.100
-   FINGERPRINT_DEVICE_PORT=4370
-   FINGERPRINT_DEVICE_PASSWORD=0
-
-   # Sync Configuration
-   SYNC_INTERVAL=300000
+   # Edit .env dengan konfigurasi yang sesuai:
+   # - FINGERPRINT_DEVICE_IP=192.168.0.201
+   # - LARAVEL_API_URL=https://yourdomain.com/api
+   # - LARAVEL_API_TOKEN=your-secret-token
    ```
 
-4. **Jalankan service**
+3. **Start service**
    ```bash
    # Development mode
    npm run dev
@@ -66,84 +47,146 @@ node-fingerprint/
    npm start
    ```
 
-## Konfigurasi
+## ⚙️ Configuration (.env)
 
-### Database
-- `DB_HOST`: Host database MySQL
-- `DB_PORT`: Port database (default: 3306)
-- `DB_NAME`: Nama database Laravel
-- `DB_USER`: Username database
-- `DB_PASSWORD`: Password database
+```env
+# Fingerprint Device
+FINGERPRINT_DEVICE_IP=192.168.0.201
+FINGERPRINT_DEVICE_PORT=80
+FINGERPRINT_COMM_KEY=0
 
-### Fingerprint Device
-- `FINGERPRINT_DEVICE_IP`: IP address mesin fingerprint
-- `FINGERPRINT_DEVICE_PORT`: Port mesin fingerprint
-- `FINGERPRINT_DEVICE_PASSWORD`: Password mesin fingerprint
+# Laravel API
+# Development (local dengan port 8000):
+LARAVEL_API_URL=http://127.0.0.1:8000/api
+# Production (ganti dengan domain Anda):
+# LARAVEL_API_URL=https://yourdomain.com/api
+LARAVEL_API_TOKEN=your-secret-token-here
 
-### Sync Configuration
-- `SYNC_INTERVAL`: Interval sinkronisasi dalam milidetik (default: 300000 = 5 menit)
+# Sync Interval (milliseconds)
+SYNC_INTERVAL=5000  # 5 detik untuk real-time
 
-### Logging
-- `LOG_LEVEL`: Level logging (info, warn, error)
-- `LOG_FILE`: File log output
+# Logging
+LOG_LEVEL=info
+LOG_FILE=logs/fingerprint.log
+```
 
-## Cara Kerja
+## 📡 API Endpoints
 
-1. **Koneksi Database**: Service terhubung ke database MySQL Laravel
-2. **Sinkronisasi Device**: Mengambil daftar mesin fingerprint aktif dari database
-3. **Pengambilan Data**: Mengambil data log dari setiap mesin fingerprint
-4. **Proses Data**: Memproses data log dan menyimpannya ke tabel attendances
-5. **Logging**: Mencatat semua aktivitas untuk monitoring
+### Laravel API Endpoints:
+- `POST /api/fingerprint/sync` - Sync single attendance record
+- `POST /api/fingerprint/sync-bulk` - Sync multiple attendance records
 
-## Tabel Database
+### Request Format:
+```json
+{
+  "pin": 113,
+  "datetime": "2025-11-01 08:15:30",
+  "verified": 15,
+  "status": 0
+}
+```
 
-Service ini menggunakan tabel-tabel berikut dari Laravel:
+## 🔧 Running di Windows Server
 
-- `employees`: Data karyawan
-- `attendances`: Data kehadiran
-- `finger_devices`: Data mesin fingerprint
-- `fingerprint_logs`: Log data fingerprint (akan dibuat otomatis)
+### Setup dengan PM2 (Recommended)
 
-## Scripts
+```powershell
+# Install PM2 global
+npm install -g pm2
 
-- `npm start`: Jalankan service dalam mode production
-- `npm run dev`: Jalankan service dalam mode development dengan nodemon
+# Start service
+cd node-fingerprint
+pm2 start index.js --name fingerprint-sync
 
-## Monitoring
+# Setup auto-start saat boot
+pm2 startup
+pm2 save
 
-Service akan mencatat semua aktivitas dalam file log. Periksa file log untuk:
-- Status koneksi database
-- Aktivitas sinkronisasi
-- Error dan warning
-- Data yang diproses
+# Monitor service
+pm2 monit
 
-## Troubleshooting
+# Check logs
+pm2 logs fingerprint-sync
 
-### Database Connection Error
-- Pastikan database MySQL Laravel sudah berjalan
-- Periksa konfigurasi database di file .env
-- Pastikan user database memiliki akses yang cukup
+# Restart service
+pm2 restart fingerprint-sync
 
-### Fingerprint Device Error
-- Pastikan mesin fingerprint terhubung ke network
-- Periksa IP address dan port mesin fingerprint
-- Pastikan password mesin fingerprint benar
+# Stop service
+pm2 stop fingerprint-sync
+```
 
-### Sync Error
-- Periksa log untuk detail error
-- Pastikan tabel database sudah ada
-- Periksa koneksi network ke mesin fingerprint
+### Setup dengan Windows Service (Alternatif)
 
-## Dependencies
+Bisa menggunakan `node-windows` atau `node-windows-service` untuk install sebagai Windows Service.
 
-- **mysql2**: Driver MySQL untuk Node.js
-- **node-cron**: Scheduler untuk sinkronisasi otomatis
-- **moment**: Manipulasi tanggal dan waktu
-- **winston**: Logging system
-- **dotenv**: Environment variables
-- **axios**: HTTP client (untuk API calls)
+## 📊 Monitoring
 
-## Lisensi
+### Check Logs
+```bash
+# View logs real-time
+tail -f logs/fingerprint.log
 
-MIT License
+# Atau dengan PM2
+pm2 logs fingerprint-sync
+```
 
+### Log Format
+```
+2025-11-01 15:30:45 [INFO]: 📡 Pulling data from fingerprint device: 192.168.0.201:80
+2025-11-01 15:30:46 [INFO]: ✅ Retrieved 5 attendance record(s) from fingerprint device
+2025-11-01 15:30:47 [INFO]: 📤 Sending 5 attendance record(s) to Laravel API...
+2025-11-01 15:30:48 [INFO]: ✅ Attendance synced: PIN 113, 2025-11-01 08:15:30
+```
+
+## 🔍 Troubleshooting
+
+### Error: Cannot connect to fingerprint device
+- ✅ Check IP address: `192.168.0.201`
+- ✅ Check network connection (ping device)
+- ✅ Check firewall (port 80)
+- ✅ Verify device is powered on
+
+### Error: Cannot connect to Laravel API
+- ✅ Check API URL: `https://yourdomain.com/api`
+- ✅ Check internet connection
+- ✅ Verify Laravel application is running
+- ✅ Check API token is correct
+
+### Error: Employee not found
+- ✅ Pastikan PIN di fingerprint device = `id_employees` di database
+- ✅ Check employee exists in database
+- ✅ Verify mapping PIN → id_employees
+
+## 📝 Notes
+
+- Service akan running terus menerus (24/7)
+- Data yang sudah di-sync tidak akan di-sync lagi (duplicate detection)
+- Service akan auto-retry jika ada error
+- Logs disimpan di `logs/fingerprint.log`
+
+## 🎯 Deployment Checklist
+
+### Development:
+- [ ] Install dependencies: `npm install`
+- [ ] Setup `.env` file
+- [ ] Test connection ke fingerprint device
+- [ ] Test connection ke Laravel API (local)
+- [ ] Run service: `npm run dev`
+
+### Production (Windows Server):
+- [ ] Copy folder `node-fingerprint` ke Windows Server
+- [ ] Setup `.env` dengan production config
+- [ ] Install dependencies: `npm install`
+- [ ] Install PM2: `npm install -g pm2`
+- [ ] Start service dengan PM2
+- [ ] Setup auto-start: `pm2 startup` & `pm2 save`
+- [ ] Verify service running: `pm2 list`
+- [ ] Monitor logs: `pm2 logs`
+
+## 📞 Support
+
+Jika ada masalah, check:
+1. Logs di `logs/fingerprint.log`
+2. PM2 logs: `pm2 logs fingerprint-sync`
+3. Network connectivity ke fingerprint device
+4. Laravel API endpoint accessibility

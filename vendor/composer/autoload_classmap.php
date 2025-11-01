@@ -11,6 +11,7 @@ return array(
     'App\\Exceptions\\Handler' => $baseDir . '/app/Exceptions/Handler.php',
     'App\\Helpers\\FingerHelper' => $baseDir . '/app/Helpers/FingerHelper.php',
     'App\\Http\\Controllers\\AdminController' => $baseDir . '/app/Http/Controllers/AdminController.php',
+    'App\\Http\\Controllers\\AdminManagementController' => $baseDir . '/app/Http/Controllers/AdminManagementController.php',
     'App\\Http\\Controllers\\AttendanceController' => $baseDir . '/app/Http/Controllers/AttendanceController.php',
     'App\\Http\\Controllers\\Auth\\ConfirmPasswordController' => $baseDir . '/app/Http/Controllers/Auth/ConfirmPasswordController.php',
     'App\\Http\\Controllers\\Auth\\ForgotPasswordController' => $baseDir . '/app/Http/Controllers/Auth/ForgotPasswordController.php',

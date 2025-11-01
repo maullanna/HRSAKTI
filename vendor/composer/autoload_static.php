@@ -536,6 +536,7 @@ class ComposerStaticInitc09dc24b3d08bdc970c9084f884de045
         'App\\Exceptions\\Handler' => __DIR__ . '/../..' . '/app/Exceptions/Handler.php',
         'App\\Helpers\\FingerHelper' => __DIR__ . '/../..' . '/app/Helpers/FingerHelper.php',
         'App\\Http\\Controllers\\AdminController' => __DIR__ . '/../..' . '/app/Http/Controllers/AdminController.php',
+        'App\\Http\\Controllers\\AdminManagementController' => __DIR__ . '/../..' . '/app/Http/Controllers/AdminManagementController.php',
         'App\\Http\\Controllers\\AttendanceController' => __DIR__ . '/../..' . '/app/Http/Controllers/AttendanceController.php',
         'App\\Http\\Controllers\\Auth\\ConfirmPasswordController' => __DIR__ . '/../..' . '/app/Http/Controllers/Auth/ConfirmPasswordController.php',
         'App\\Http\\Controllers\\Auth\\ForgotPasswordController' => __DIR__ . '/../..' . '/app/Http/Controllers/Auth/ForgotPasswordController.php',

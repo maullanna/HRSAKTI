@@ -1,8 +1,11 @@
-const mysql = require('mysql2/promise');
-const cron = require('node-cron');
-const moment = require('moment');
+const axios = require('axios');
 const winston = require('winston');
 require('dotenv').config();
+
+// Import custom modules
+const SoapClient = require('./lib/soapClient');
+const XmlParser = require('./lib/xmlParser');
+const ApiSender = require('./lib/apiSender');
 
 // Configure logger
 const logger = winston.createLogger({
@@ -10,245 +13,246 @@ const logger = winston.createLogger({
     format: winston.format.combine(
         winston.format.timestamp(),
         winston.format.errors({ stack: true }),
-        winston.format.json()
+        winston.format.printf(({ timestamp, level, message, ...meta }) => {
+            return `${timestamp} [${level.toUpperCase()}]: ${message} ${Object.keys(meta).length ? JSON.stringify(meta, null, 2) : ''}`;
+        })
     ),
     transports: [
-        new winston.transports.File({ filename: process.env.LOG_FILE || 'logs/fingerprint.log' }),
+        new winston.transports.File({ 
+            filename: process.env.LOG_FILE || 'logs/fingerprint.log',
+            maxsize: 5242880, // 5MB
+            maxFiles: 5
+        }),
         new winston.transports.Console({
-            format: winston.format.simple()
+            format: winston.format.combine(
+                winston.format.colorize(),
+                winston.format.simple()
+            )
         })
     ]
 });
 
-// Database connection
-let dbConnection;
+// Configuration from environment variables
+const config = {
+    fingerprint: {
+        ip: process.env.FINGERPRINT_DEVICE_IP || '192.168.0.201',
+        port: parseInt(process.env.FINGERPRINT_DEVICE_PORT) || 80,
+        commKey: parseInt(process.env.FINGERPRINT_COMM_KEY) || 0
+    },
+    laravel: {
+        apiUrl: process.env.LARAVEL_API_URL || 'http://127.0.0.1:8000/api',
+        apiToken: process.env.LARAVEL_API_TOKEN || ''
+    },
+    sync: {
+        interval: parseInt(process.env.SYNC_INTERVAL) || 5000 // 5 seconds default
+    }
+};
 
-const connectDatabase = async () => {
+// Track last sync time to avoid duplicates
+let lastSyncTimestamp = null;
+
+/**
+ * Pull attendance data from fingerprint device via SOAP
+ * 
+ * @returns {Promise<Array>} - Array of attendance records
+ */
+const pullFingerprintData = async () => {
     try {
-        dbConnection = await mysql.createConnection({
-            host: process.env.DB_HOST || 'localhost',
-            port: process.env.DB_PORT || 3306,
-            user: process.env.DB_USER || 'root',
-            password: process.env.DB_PASSWORD || '',
-            database: process.env.DB_NAME || 'attendance_management_system',
-            charset: 'utf8mb4'
+        logger.info(`📡 Pulling data from fingerprint device: ${config.fingerprint.ip}:${config.fingerprint.port}`);
+
+        // Get attendance log via SOAP
+        const xmlResponse = await SoapClient.getAttendanceLog(
+            config.fingerprint.ip,
+            config.fingerprint.port,
+            config.fingerprint.commKey
+        );
+
+        // Parse XML response
+        const attendances = await XmlParser.parseAttendanceResponse(xmlResponse);
+
+        logger.info(`✅ Retrieved ${attendances.length} attendance record(s) from fingerprint device`);
+
+        return attendances;
+
+    } catch (error) {
+        logger.error(`❌ Failed to pull data from fingerprint device: ${error.message}`);
+        throw error;
+    }
+};
+
+/**
+ * Send attendance data to Laravel API
+ * 
+ * @param {Array} attendances - Array of attendance records
+ */
+const sendToLaravel = async (attendances) => {
+    if (!attendances || attendances.length === 0) {
+        logger.info('ℹ️ No attendance data to send');
+        return;
+    }
+
+    // Filter new records (only send if datetime is newer than last sync)
+    let newAttendances = attendances;
+    if (lastSyncTimestamp) {
+        newAttendances = attendances.filter(att => {
+            const attTime = new Date(att.datetime).getTime();
+            return attTime > lastSyncTimestamp;
         });
-        
-        logger.info('✅ Database connected successfully');
-        return true;
-    } catch (error) {
-        logger.error('❌ Database connection failed:', error.message);
-        return false;
     }
-};
 
-// Simulate fingerprint device data collection
-const collectFingerprintData = async () => {
-    try {
-        logger.info('🔍 Collecting fingerprint data...');
-        
-        // Simulate data from fingerprint device
-        const mockFingerprintData = [
-            {
-                employee_id: 'EMP001',
-                fingerprint_id: 1,
-                timestamp: moment().format('YYYY-MM-DD HH:mm:ss'),
-                device_id: 1,
-                action: 'check_in'
-            },
-            {
-                employee_id: 'EMP002',
-                fingerprint_id: 2,
-                timestamp: moment().subtract(30, 'minutes').format('YYYY-MM-DD HH:mm:ss'),
-                device_id: 1,
-                action: 'check_in'
-            },
-            {
-                employee_id: 'EMP001',
-                fingerprint_id: 1,
-                timestamp: moment().subtract(15, 'minutes').format('YYYY-MM-DD HH:mm:ss'),
-                device_id: 1,
-                action: 'check_out'
+    if (newAttendances.length === 0) {
+        logger.info('ℹ️ No new attendance records to sync');
+        return;
+    }
+
+    logger.info(`📤 Sending ${newAttendances.length} attendance record(s) to Laravel API...`);
+
+    // Send each attendance record to Laravel API
+    let successCount = 0;
+    let errorCount = 0;
+    let duplicateCount = 0;
+
+    for (const attendance of newAttendances) {
+        const result = await ApiSender.sendSingle(
+            config.laravel.apiUrl,
+            config.laravel.apiToken,
+            attendance,
+            logger
+        );
+
+        if (result.success) {
+            successCount++;
+            // Update last sync timestamp
+            const attTime = new Date(attendance.datetime).getTime();
+            if (!lastSyncTimestamp || attTime > lastSyncTimestamp) {
+                lastSyncTimestamp = attTime;
             }
-        ];
-
-        // Process each fingerprint log
-        for (const logData of mockFingerprintData) {
-            await processFingerprintLog(logData);
-        }
-
-        logger.info(`✅ Processed ${mockFingerprintData.length} fingerprint logs`);
-        
-    } catch (error) {
-        logger.error('❌ Error collecting fingerprint data:', error.message);
-    }
-};
-
-// Process individual fingerprint log
-const processFingerprintLog = async (logData) => {
-    try {
-        // Check if employee exists
-        const [employees] = await dbConnection.execute(
-            'SELECT id, name FROM employees WHERE employee_id = ?',
-            [logData.employee_id]
-        );
-
-        if (employees.length === 0) {
-            logger.warn(`⚠️ Employee not found: ${logData.employee_id}`);
-            return;
-        }
-
-        const employee = employees[0];
-        const logDate = moment(logData.timestamp).format('YYYY-MM-DD');
-        const logTime = moment(logData.timestamp).format('HH:mm:ss');
-
-        // Check if attendance record exists for today
-        const [existingAttendance] = await dbConnection.execute(
-            'SELECT id, time_in, time_out FROM attendances WHERE employee_id = ? AND DATE(attendance_date) = ?',
-            [employee.id, logDate]
-        );
-
-        if (existingAttendance.length === 0) {
-            // Create new attendance record
-            if (logData.action === 'check_in') {
-                await dbConnection.execute(
-                    'INSERT INTO attendances (employee_id, attendance_date, time_in, created_at, updated_at) VALUES (?, ?, ?, NOW(), NOW())',
-                    [employee.id, logDate, logTime]
-                );
-                logger.info(`✅ Created attendance record for ${employee.name} - Check In: ${logTime}`);
+        } else if (result.duplicate) {
+            duplicateCount++;
+            // Still update timestamp for duplicates
+            const attTime = new Date(attendance.datetime).getTime();
+            if (!lastSyncTimestamp || attTime > lastSyncTimestamp) {
+                lastSyncTimestamp = attTime;
             }
         } else {
-            // Update existing attendance record
-            const attendance = existingAttendance[0];
-            
-            if (logData.action === 'check_in' && !attendance.time_in) {
-                await dbConnection.execute(
-                    'UPDATE attendances SET time_in = ?, updated_at = NOW() WHERE id = ?',
-                    [logTime, attendance.id]
-                );
-                logger.info(`✅ Updated attendance record for ${employee.name} - Check In: ${logTime}`);
-            } else if (logData.action === 'check_out' && attendance.time_in && !attendance.time_out) {
-                await dbConnection.execute(
-                    'UPDATE attendances SET time_out = ?, updated_at = NOW() WHERE id = ?',
-                    [logTime, attendance.id]
-                );
-                logger.info(`✅ Updated attendance record for ${employee.name} - Check Out: ${logTime}`);
-            }
+            errorCount++;
         }
 
-        // Insert fingerprint log for tracking
-        await dbConnection.execute(
-            'INSERT INTO fingerprint_logs (employee_id, device_id, action, timestamp, created_at, updated_at) VALUES (?, ?, ?, ?, NOW(), NOW())',
-            [employee.id, logData.device_id, logData.action, logData.timestamp]
-        );
-
-    } catch (error) {
-        logger.error('❌ Error processing fingerprint log:', error.message);
+        // Small delay between requests to avoid overwhelming API
+        await new Promise(resolve => setTimeout(resolve, 100));
     }
+
+    logger.info(`✅ Sync completed: ${successCount} success, ${duplicateCount} duplicates, ${errorCount} errors`);
 };
 
-// Get fingerprint devices from database
-const getFingerprintDevices = async () => {
+/**
+ * Main sync function - Pull from fingerprint and send to Laravel
+ */
+const syncAttendance = async () => {
     try {
-        const [devices] = await dbConnection.execute(
-            'SELECT id, name, ip_address, port, status FROM finger_devices WHERE status = "active"'
-        );
-        return devices;
-    } catch (error) {
-        logger.error('❌ Error getting fingerprint devices:', error.message);
-        return [];
-    }
-};
+        logger.info('🔄 Starting attendance sync...');
 
-// Sync data with fingerprint devices
-const syncWithFingerprintDevices = async () => {
-    try {
-        const devices = await getFingerprintDevices();
-        
-        if (devices.length === 0) {
-            logger.warn('⚠️ No active fingerprint devices found');
+        // Test connection to fingerprint device
+        const fingerprintConnected = await SoapClient.testConnection(
+            config.fingerprint.ip,
+            config.fingerprint.port
+        );
+
+        if (!fingerprintConnected) {
+            logger.error(`❌ Cannot connect to fingerprint device at ${config.fingerprint.ip}:${config.fingerprint.port}`);
+            logger.error('⚠️ Please check:');
+            logger.error('   1. Fingerprint device is powered on and connected to network');
+            logger.error('   2. IP address is correct: ' + config.fingerprint.ip);
+            logger.error('   3. Network connection is available');
             return;
         }
 
-        logger.info(`🔄 Syncing with ${devices.length} fingerprint device(s)...`);
-
-        for (const device of devices) {
-            await syncWithDevice(device);
-        }
-
-    } catch (error) {
-        logger.error('❌ Error syncing with fingerprint devices:', error.message);
-    }
-};
-
-// Sync with individual device
-const syncWithDevice = async (device) => {
-    try {
-        logger.info(`📡 Syncing with device: ${device.name} (${device.ip_address}:${device.port})`);
-        
-        // Here you would implement the actual communication with the fingerprint device
-        // This is a placeholder for the sync logic
-        
-        // Update device last sync time
-        await dbConnection.execute(
-            'UPDATE finger_devices SET last_sync = NOW() WHERE id = ?',
-            [device.id]
+        // Test connection to Laravel API
+        const apiConnected = await ApiSender.testConnection(
+            config.laravel.apiUrl,
+            config.laravel.apiToken
         );
 
-        logger.info(`✅ Sync completed for device: ${device.name}`);
-        
+        if (!apiConnected) {
+            logger.error(`❌ Cannot connect to Laravel API at ${config.laravel.apiUrl}`);
+            logger.error('⚠️ Please check:');
+            logger.error('   1. Laravel application is running and accessible');
+            logger.error('   2. API URL is correct: ' + config.laravel.apiUrl);
+            logger.error('   3. API token is correct');
+            logger.error('   4. Internet connection is available (for production)');
+            return;
+        }
+
+        // Pull data from fingerprint device
+        const attendances = await pullFingerprintData();
+
+        // Send data to Laravel API
+        await sendToLaravel(attendances);
+
+        logger.info('✅ Attendance sync completed successfully');
+
     } catch (error) {
-        logger.error(`❌ Error syncing with device ${device.name}:`, error.message);
+        logger.error(`❌ Sync failed: ${error.message}`);
+        if (error.stack) {
+            logger.error(`Stack trace: ${error.stack}`);
+        }
     }
 };
 
-// Main function
+/**
+ * Main function - Start the service
+ */
 const main = async () => {
-    logger.info('🚀 Starting Node.js Fingerprint Service...');
-    
-    // Connect to database
-    const dbConnected = await connectDatabase();
-    if (!dbConnected) {
-        logger.error('❌ Failed to connect to database. Exiting...');
-        process.exit(1);
-    }
+    logger.info('🚀 Starting Node.js Fingerprint Sync Service...');
+    logger.info('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+    logger.info(`📋 Configuration:`);
+    logger.info(`   Fingerprint Device: ${config.fingerprint.ip}:${config.fingerprint.port}`);
+    logger.info(`   Laravel API URL: ${config.laravel.apiUrl}`);
+    logger.info(`   Sync Interval: ${config.sync.interval}ms (${config.sync.interval / 1000}s)`);
+    logger.info(`   API Token: ${config.laravel.apiToken ? '✅ Set' : '❌ Not set (recommended for security)'}`);
+    logger.info('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
 
     // Initial sync
-    await syncWithFingerprintDevices();
-    await collectFingerprintData();
+    logger.info('🔄 Running initial sync...');
+    await syncAttendance();
 
-    // Schedule periodic sync
-    const syncInterval = parseInt(process.env.SYNC_INTERVAL) || 300000; // 5 minutes default
-    
-    cron.schedule('*/5 * * * *', async () => {
-        logger.info('⏰ Running scheduled sync...');
-        await syncWithFingerprintDevices();
-        await collectFingerprintData();
-    });
+    // Setup interval sync
+    const intervalMs = config.sync.interval;
+    logger.info(`⏰ Setting up auto-sync every ${intervalMs / 1000} seconds...`);
 
-    logger.info(`✅ Service started. Sync interval: ${syncInterval}ms`);
-    logger.info('📊 Monitoring fingerprint devices...');
+    setInterval(async () => {
+        await syncAttendance();
+    }, intervalMs);
+
+    logger.info('✅ Service is running. Monitoring fingerprint device...');
+    logger.info('📝 Press Ctrl+C to stop the service');
 };
 
 // Handle graceful shutdown
 process.on('SIGINT', async () => {
-    logger.info('🛑 Shutting down gracefully...');
-    if (dbConnection) {
-        await dbConnection.end();
-    }
+    logger.info('🛑 Received SIGINT. Shutting down gracefully...');
+    logger.info('👋 Service stopped');
     process.exit(0);
 });
 
 process.on('SIGTERM', async () => {
-    logger.info('🛑 Shutting down gracefully...');
-    if (dbConnection) {
-        await dbConnection.end();
-    }
+    logger.info('🛑 Received SIGTERM. Shutting down gracefully...');
+    logger.info('👋 Service stopped');
     process.exit(0);
+});
+
+// Handle unhandled errors
+process.on('unhandledRejection', (reason, promise) => {
+    logger.error('❌ Unhandled Rejection at:', promise, 'reason:', reason);
+});
+
+process.on('uncaughtException', (error) => {
+    logger.error('❌ Uncaught Exception:', error);
+    process.exit(1);
 });
 
 // Start the service
 main().catch(error => {
-    logger.error('❌ Fatal error:', error);
+    logger.error('❌ Fatal error starting service:', error);
     process.exit(1);
 });
