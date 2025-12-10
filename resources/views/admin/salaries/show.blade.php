@@ -1,14 +1,14 @@
 @extends('layouts.master')
 
 @section('breadcrumb')
-    <div class="col-sm-6">
-        <h4 class="page-title text-left">Salary Details</h4>
-        <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="javascript:void(0);">Home</a></li>
-            <li class="breadcrumb-item"><a href="{{ route('salaries.index') }}">Salaries</a></li>
-            <li class="breadcrumb-item active">Details</li>
-        </ol>
-    </div>
+<div class="col-sm-6">
+    <h4 class="page-title text-left">Salary Details</h4>
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="javascript:void(0);">Home</a></li>
+        <li class="breadcrumb-item"><a href="{{ route('salaries.index') }}">Salaries</a></li>
+        <li class="breadcrumb-item active">Details</li>
+    </ol>
+</div>
 @endsection
 
 @section('content')
@@ -39,7 +39,7 @@
                             </tr>
                             <tr>
                                 <td><strong>Employee ID:</strong></td>
-                                <td>{{ $salary->employee->id }}</td>
+                                <td>{{ $salary->employee->id_employees }}</td>
                             </tr>
                             <tr>
                                 <td><strong>Posisi:</strong></td>
@@ -51,7 +51,7 @@
                             </tr>
                         </table>
                     </div>
-                    
+
                     <div class="col-md-6">
                         <h6>Rincian Gaji</h6>
                         <table class="table table-borderless">
@@ -98,9 +98,9 @@
                             </table>
                         </div>
                     </div>
-                @endif
+                    @endif
 
-                @if(count($salary->deductions) > 0)
+                    @if(count($salary->deductions) > 0)
                     <div class="col-md-6">
                         <h6>Potongan Detail</h6>
                         <div class="table-responsive">

@@ -29,7 +29,7 @@ class AdminManagementController extends Controller
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:8|confirmed',
             'roles' => 'required|array|min:1',
-            'roles.*' => 'exists:roles,id'
+            'roles.*' => 'exists:roles,id_role'
         ]);
 
         if ($validator->fails()) {
@@ -73,7 +73,7 @@ class AdminManagementController extends Controller
             'email' => 'required|string|email|max:255|unique:users,email,' . $id,
             'password' => 'nullable|string|min:8|confirmed',
             'roles' => 'required|array|min:1',
-            'roles.*' => 'exists:roles,id'
+            'roles.*' => 'exists:roles,id_role'
         ]);
 
         if ($validator->fails()) {

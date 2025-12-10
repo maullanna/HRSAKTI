@@ -7,8 +7,23 @@ use Carbon\Carbon;
 
 class Leave extends Model
 {
+    protected $primaryKey = 'id_leave';
+    public $incrementing = true;
+    protected $keyType = 'int';
+
+    public function getRouteKeyName()
+    {
+        return 'id_leave';
+    }
+
     protected $fillable = [
-        'emp_id', 'leave_date', 'leave_time', 'type', 'state', 'status', 'uid'
+        'emp_id',
+        'leave_date',
+        'leave_time',
+        'type',
+        'state',
+        'status',
+        'uid'
     ];
 
     protected $casts = [
@@ -18,7 +33,7 @@ class Leave extends Model
 
     public function employee()
     {
-        return $this->belongsTo(Employee::class, 'emp_id');
+        return $this->belongsTo(Employee::class, 'emp_id', 'id_employees');
     }
 
     public function getLeaveTypeAttribute()

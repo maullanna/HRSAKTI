@@ -22,7 +22,9 @@ class SettingsController extends Controller
         $request->validate([
             'ams_logo_type' => 'required|in:predefined,upload',
             'ams_logo' => 'required_if:ams_logo_type,predefined|string',
-            'ams_logo_upload' => 'required_if:ams_logo_type,upload|image|mimes:png,jpg,jpeg,svg|max:2048',
+            'ams_logo_upload' => 'nullable|image|mimes:png,jpg,jpeg,svg|max:2048',
+            'system_name' => 'nullable|string|max:30',
+            'system_name_visible' => 'nullable|in:0,1',
             'footer_text' => 'required|string|max:1000',
         ]);
 
@@ -47,8 +49,15 @@ class SettingsController extends Controller
                     $path = $file->storeAs('public/logos', $filename);
                     $settings['ams_logo'] = 'storage/logos/' . $filename;
                     $settings['ams_logo_type'] = 'upload';
+                } else {
+                    // Keep existing logo if no new file uploaded
+                    $settings['ams_logo_type'] = 'upload';
                 }
             }
+            
+            // System name settings - Always save even if empty
+            $settings['system_name'] = $request->input('system_name', 'HRSAKTI');
+            $settings['system_name_visible'] = $request->input('system_name_visible', '1');
             
             // Footer settings
             $settings['footer_text'] = $request->footer_text;

@@ -23,6 +23,8 @@ if (!function_exists('getSetting')) {
         $defaults = [
             'ams_logo' => 'assets/images/logo.png',
             'ams_logo_type' => 'predefined',
+            'system_name' => 'HRSAKTI',
+            'system_name_visible' => '1',
             'footer_text' => 'Attendance Management System',
             'footer_show_year' => 1,
             'footer_show_author' => 1,

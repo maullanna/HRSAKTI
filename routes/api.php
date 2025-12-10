@@ -19,5 +19,8 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 });
 
 // Fingerprint Sync API - Called by Node.js service
-Route::post('/fingerprint/sync', [\App\Http\Controllers\Api\FingerprintSyncController::class, 'sync']);
-Route::post('/fingerprint/sync-bulk', [\App\Http\Controllers\Api\FingerprintSyncController::class, 'syncBulk']);
+// Use 'throttle:none' to bypass rate limiting completely
+Route::middleware('throttle:none')->group(function () {
+    Route::post('/fingerprint/sync', [\App\Http\Controllers\Api\FingerprintSyncController::class, 'sync']);
+    Route::post('/fingerprint/sync-bulk', [\App\Http\Controllers\Api\FingerprintSyncController::class, 'syncBulk']);
+});

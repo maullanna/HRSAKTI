@@ -1,10 +1,10 @@
 <div class="page-title-box">
     <div class="row align-items-center">
-         @yield('breadcrumb')
+         <?php echo $__env->yieldContent('breadcrumb'); ?>
             <div class="col-sm-6">
                 <div class="float-right d-none d-md-block">
                      <div class="">
-                        @yield('button')
+                        <?php echo $__env->yieldContent('button'); ?>
                      </div>
                  </div>
             </div>

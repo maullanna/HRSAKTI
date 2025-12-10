@@ -1,27 +1,28 @@
 {
-  "name": "attendance_management_system",
-  "version": "1.0.0",
-  "description": "Node.js dashboard untuk sistem manajemen kehadiran berbasis fingerprint yang terintegrasi dengan Laravel Attendance Management System.",
-  "main": "webpack.mix.js",
-  "directories": {
-    "test": "tests"
-  },
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/aliatayee/Attendance_Management_System.git"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/aliatayee/Attendance_Management_System/issues"
-  },
-  "homepage": "https://github.com/aliatayee/Attendance_Management_System#readme",
-  "dependencies": {
-    "dotenv": "^17.2.2",
-    "mysql2": "^3.15.1"
-  }
+    "name": "attendance_management_system",
+    "version": "1.0.0",
+    "description": "Node.js dashboard untuk sistem manajemen kehadiran berbasis fingerprint yang terintegrasi dengan Laravel Attendance Management System.",
+    "main": "webpack.mix.js",
+    "directories": {
+        "test": "tests"
+    },
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/aliatayee/Attendance_Management_System.git"
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "bugs": {
+        "url": "https://github.com/aliatayee/Attendance_Management_System/issues"
+    },
+    "homepage": "https://github.com/aliatayee/Attendance_Management_System#readme",
+    "dependencies": {
+        "dotenv": "^17.2.2",
+        "mysql2": "^3.15.1",
+        "axios": "^1.6.0"
+    }
 }

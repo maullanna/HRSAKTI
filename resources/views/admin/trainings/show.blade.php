@@ -95,7 +95,7 @@
                             </tr>
                             <tr>
                                 <td><strong>Employee ID:</strong></td>
-                                <td>{{ $training->employee->id }}</td>
+                                <td>{{ $training->employee->id_employees }}</td>
                             </tr>
                             <tr>
                                 <td><strong>Position:</strong></td>

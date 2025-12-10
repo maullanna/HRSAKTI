@@ -82,10 +82,10 @@
                                         <div class="col-md-3">
                                             <div class="custom-control custom-checkbox">
                                                 <input type="checkbox" class="custom-control-input" 
-                                                       id="role_{{ $role->id }}" name="roles[]" 
-                                                       value="{{ $role->id }}"
-                                                       {{ in_array($role->id, old('roles', [])) ? 'checked' : '' }}>
-                                                <label class="custom-control-label" for="role_{{ $role->id }}">
+                                                       id="role_{{ $role->id_role }}" name="roles[]" 
+                                                       value="{{ $role->id_role }}"
+                                                       {{ in_array($role->id_role, old('roles', [])) ? 'checked' : '' }}>
+                                                <label class="custom-control-label" for="role_{{ $role->id_role }}">
                                                     {{ $role->name }}
                                                 </label>
                                             </div>

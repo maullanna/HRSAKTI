@@ -28,8 +28,8 @@
                                 <select name="employee_id" id="employee_id" class="form-control @error('employee_id') is-invalid @enderror" required>
                                     <option value="">Select Employee</option>
                                     @foreach($employees as $employee)
-                                        <option value="{{ $employee->id }}" {{ old('employee_id') == $employee->id ? 'selected' : '' }}>
-                                            {{ $employee->name }} (ID: {{ $employee->id }})
+                                        <option value="{{ $employee->id_employees }}" {{ old('employee_id') == $employee->id_employees ? 'selected' : '' }}>
+                                            {{ $employee->name }} (ID: {{ $employee->id_employees }})
                                         </option>
                                     @endforeach
                                 </select>

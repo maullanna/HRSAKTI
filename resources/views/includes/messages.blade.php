@@ -1,37 +1,37 @@
-@if (count($errors) > 0)
-@foreach ($errors->all() as $error)
+<?php if (count($errors) > 0): ?>
+<?php foreach ($errors->all() as $error): ?>
 <div class="alert alert-danger alert-dismissible">
     <button type='button' class='close' data-dismiss='alert' aria-hidden='true'>&times;</button>
     <h4><i class='icon fa fa-warning'></i> Error!</h4>
-        {{ $error }}
+        <?php echo e($error); ?>
     
 </div>
-@endforeach
-@endif
+<?php endforeach; ?>
+<?php endif; ?>
 
-@if (session('success'))
+<?php if (session('success')): ?>
 <div class='alert alert-success alert-dismissible'>
     <button type='button' class='close' data-dismiss='alert' aria-hidden='true'>&times;</button>
     <h4><i class='icon fa fa-check'></i> Success!</h4>
-    {{session('success')}}
+    <?php echo e(session('success')); ?>
 
 </div>
-@endif
+<?php endif; ?>
 
-@if (session('error'))
+<?php if (session('error')): ?>
     <div class='alert alert-danger alert-dismissible'>
         <button type='button' class='close' data-dismiss='alert' aria-hidden='true'>&times;</button>
         <h4><i class='icon fa fa-warning'></i> Error!</h4>
-        {{session('error')}}
+        <?php echo e(session('error')); ?>
     </div>
-@endif
+<?php endif; ?>
 
-@if (session('info'))
+<?php if (session('info')): ?>
 <div class="alert alert-info">
     <p class="text-center"><i class="fa fa-exclamation fa-lg" aria-hidden="true"></i>
-        {{ session('info')}}
+        <?php echo e(session('info')); ?>
     </p>
 </div>
 
 
-@endif
+<?php endif; ?>

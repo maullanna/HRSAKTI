@@ -1,0 +1,148 @@
+/* Sidebar Fix - Ensure sidebar displays correctly */
+
+/* Left sidebar width and position */
+.left.side-menu {
+    width: 240px;
+    z-index: 10;
+    background: #2f3e47;
+    bottom: 0;
+    margin-top: 0;
+    position: fixed;
+    top: 70px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+}
+
+/* Topbar logo container */
+.topbar-left {
+    float: left;
+    text-align: center;
+    height: 70px;
+    position: relative;
+    width: 240px;
+    z-index: 1;
+    background: #ffffff;
+}
+
+.topbar-left .logo {
+    line-height: 70px;
+    display: block;
+}
+
+.topbar-left .logo img {
+    max-height: 50px;
+    height: auto !important;
+    max-width: 200px !important;
+    vertical-align: middle;
+}
+
+/* Content page adjustment */
+.content-page {
+    margin-left: 240px;
+    overflow: hidden;
+}
+
+/* Button menu mobile */
+.button-menu-mobile {
+    background-color: transparent;
+    border: none;
+    color: #2f3e47;
+    font-size: 24px;
+    line-height: 70px;
+    padding: 0 15px;
+    cursor: pointer;
+}
+
+/* Ensure sidebar is visible */
+#sidebar-menu {
+    padding: 10px 0;
+}
+
+#sidebar-menu ul li a {
+    display: block;
+    padding: 12px 20px;
+    color: rgba(255, 255, 255, 0.5);
+    position: relative;
+    font-size: 15px;
+    transition: all 0.4s;
+}
+
+#sidebar-menu ul li a:hover {
+    color: #ffffff;
+    background-color: rgba(255, 255, 255, 0.05);
+}
+
+#sidebar-menu ul li a.mm.active {
+    color: #ffffff;
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Menu title */
+#sidebar-menu ul li.menu-title {
+    padding: 15px 20px;
+    letter-spacing: 0.05em;
+    pointer-events: none;
+    cursor: default;
+    font-size: 11px;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.4);
+    font-weight: 600;
+}
+
+/* Responsive - Mobile */
+@media (max-width: 768px) {
+    .left.side-menu {
+        box-shadow: 0 0 24px 0 rgba(0, 0, 0, 0.06),
+            0 1px 0 0 rgba(0, 0, 0, 0.02);
+        left: -240px;
+        transition: all 0.2s ease-out;
+    }
+
+    body.sidebar-enable .left.side-menu {
+        left: 0;
+    }
+
+    .content-page {
+        margin-left: 0 !important;
+    }
+
+    .topbar-left {
+        width: 70px;
+    }
+
+    .topbar-left .logo {
+        line-height: 70px;
+    }
+
+    .topbar-left .logo img {
+        max-width: 50px !important;
+    }
+}
+
+/* Enlarged sidebar */
+body.enlarged .left.side-menu {
+    width: 70px;
+}
+
+body.enlarged .content-page {
+    margin-left: 70px;
+}
+
+body.enlarged .topbar-left {
+    width: 70px;
+}
+
+body.enlarged #sidebar-menu ul li a span {
+    display: none;
+    padding-left: 10px;
+}
+
+/* Fix for overlapping elements */
+.topbar {
+    position: fixed;
+    left: 0;
+    right: 0;
+    top: 0;
+    z-index: 999;
+    background-color: #ffffff;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}

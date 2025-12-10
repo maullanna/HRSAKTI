@@ -9,9 +9,23 @@ class Training extends Model
 {
     use HasFactory;
 
+    protected $primaryKey = 'id_training';
+    public $incrementing = true;
+    protected $keyType = 'int';
+
+    public function getRouteKeyName()
+    {
+        return 'id_training';
+    }
+
     protected $fillable = [
-        'employee_id', 'title', 'category', 'start_date', 'end_date', 
-        'status', 'description'
+        'employee_id',
+        'title',
+        'category',
+        'start_date',
+        'end_date',
+        'status',
+        'description'
     ];
 
     protected $casts = [
@@ -21,14 +35,6 @@ class Training extends Model
 
     public function employee()
     {
-        return $this->belongsTo(Employee::class);
+        return $this->belongsTo(Employee::class, 'employee_id', 'id_employees');
     }
 }
-
-
-
-
-
-
-
-

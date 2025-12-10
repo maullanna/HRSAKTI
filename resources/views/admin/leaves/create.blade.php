@@ -20,18 +20,27 @@
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-group">
-                                <label for="emp_id">Employee <span class="text-danger">*</span></label>
-                                <select class="form-control @error('emp_id') is-invalid @enderror" id="emp_id" name="emp_id" required>
-                                    <option value="">Select Employee</option>
-                                    @foreach($employees as $employee)
-                                        <option value="{{ $employee->id }}" {{ old('emp_id') == $employee->id ? 'selected' : '' }}>
-                                            {{ $employee->name }} ({{ $employee->employee_code }})
-                                        </option>
-                                    @endforeach
-                                </select>
-                                @error('emp_id')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
+                                @if(isset($currentEmployee) && $currentEmployee)
+                                    {{-- Employee is logged in, show readonly field --}}
+                                    <label for="emp_id">Employee <span class="text-danger">*</span></label>
+                                    <input type="hidden" name="emp_id" value="{{ $currentEmployee->id_employees }}">
+                                    <input type="text" class="form-control" value="{{ $currentEmployee->name }} ({{ $currentEmployee->employee_code ?? $currentEmployee->id_employees }})" readonly style="background-color: #e9ecef;">
+                                    <small class="form-text text-muted">Your employee information is automatically filled</small>
+                                @else
+                                    {{-- Admin can select employee --}}
+                                    <label for="emp_id">Employee <span class="text-danger">*</span></label>
+                                    <select class="form-control @error('emp_id') is-invalid @enderror" id="emp_id" name="emp_id" required>
+                                        <option value="">Select Employee</option>
+                                        @foreach($employees as $employee)
+                                            <option value="{{ $employee->id_employees }}" {{ old('emp_id') == $employee->id_employees ? 'selected' : '' }}>
+                                                {{ $employee->name }} ({{ $employee->employee_code ?? $employee->id_employees }})
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                    @error('emp_id')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                @endif
                             </div>
                         </div>
 
@@ -94,6 +103,8 @@
                             </div>
                         </div>
 
+                        @if(!isset($currentEmployee) || !$currentEmployee)
+                        {{-- Only show status field for admin --}}
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label for="status">Status <span class="text-danger">*</span></label>
@@ -108,6 +119,10 @@
                                 @enderror
                             </div>
                         </div>
+                        @else
+                        {{-- Employee cannot set status, it will be pending by default --}}
+                        <input type="hidden" name="status" value="pending">
+                        @endif
                     </div>
 
                     <div class="form-group text-right">

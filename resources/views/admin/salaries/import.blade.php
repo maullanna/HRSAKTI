@@ -1,14 +1,14 @@
 @extends('layouts.master')
 
 @section('breadcrumb')
-    <div class="col-sm-6">
-        <h4 class="page-title text-left">Import Salaries</h4>
-        <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="javascript:void(0);">Home</a></li>
-            <li class="breadcrumb-item"><a href="{{ route('salaries.index') }}">Salaries</a></li>
-            <li class="breadcrumb-item active">Import</li>
-        </ol>
-    </div>
+<div class="col-sm-6">
+    <h4 class="page-title text-left">Import Salaries</h4>
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="javascript:void(0);">Home</a></li>
+        <li class="breadcrumb-item"><a href="{{ route('salaries.index') }}">Salaries</a></li>
+        <li class="breadcrumb-item active">Import</li>
+    </ol>
+</div>
 @endsection
 
 @section('content')
@@ -19,34 +19,34 @@
         <div class="card">
             <div class="card-header">
                 <h5 class="card-title">Import Data Gaji</h5>
-                <p class="card-text">Upload file Excel atau CSV untuk mengimpor data gaji karyawan.</p>
+                <p class="card-text">Upload file Excel (XLSX) untuk mengimpor data gaji karyawan.</p>
             </div>
             <div class="card-body">
                 <form action="{{ route('salaries.import') }}" method="POST" enctype="multipart/form-data" id="importForm">
                     @csrf
-                    
+
                     <div class="row">
                         <div class="col-md-8">
                             <div class="form-group">
                                 <label for="import_file">Pilih File <span class="text-danger">*</span></label>
-                                <input type="file" name="import_file" id="import_file" 
-                                       class="form-control @error('import_file') is-invalid @enderror" 
-                                       accept=".csv,.xlsx,.xls" required>
+                                <input type="file" name="import_file" id="import_file"
+                                    class="form-control @error('import_file') is-invalid @enderror"
+                                    accept=".xlsx" required>
                                 <small class="form-text text-muted">
-                                    Format yang didukung: CSV, XLSX, XLS (Maksimal 2MB)
+                                    Format yang didukung: XLSX saja (Maksimal 2MB)
                                 </small>
                                 @error('import_file')
-                                    <div class="invalid-feedback">{{ $message }}</div>
+                                <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
                             </div>
                         </div>
-                        
+
                         <div class="col-md-4">
                             <div class="form-group">
                                 <label>&nbsp;</label>
                                 <div>
-                                    <a href="{{ route('salaries.download-template') }}" 
-                                       class="btn btn-info btn-sm">
+                                    <a href="{{ route('salaries.download-template') }}"
+                                        class="btn btn-info btn-sm">
                                         <i class="mdi mdi-download mr-1"></i>Download Template
                                     </a>
                                 </div>
@@ -79,9 +79,7 @@
                     <div class="col-md-6">
                         <h6>Format File yang Didukung:</h6>
                         <ul>
-                            <li><strong>CSV</strong> - Comma Separated Values</li>
-                            <li><strong>XLSX</strong> - Excel 2007+</li>
-                            <li><strong>XLS</strong> - Excel 97-2003</li>
+                            <li><strong>XLSX</strong> - Excel 2007+ (Format yang digunakan)</li>
                         </ul>
 
                         <h6>Kolom yang Diperlukan:</h6>
@@ -93,13 +91,13 @@
                             <li><strong>deductions</strong> - Potongan (opsional, format JSON)</li>
                         </ol>
                     </div>
-                    
+
                     <div class="col-md-6">
                         <h6>Contoh Format Allowances & Deductions:</h6>
                         <div class="alert alert-info">
                             <strong>JSON Format:</strong><br>
                             <code>{"transport": 500000, "meal": 300000}</code><br><br>
-                            
+
                             <strong>Key:Value Format:</strong><br>
                             <code>transport: 500000; meal: 300000</code>
                         </div>
@@ -135,46 +133,46 @@
 </div>
 
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    const form = document.getElementById('importForm');
-    const importBtn = document.getElementById('importBtn');
-    const fileInput = document.getElementById('import_file');
+    document.addEventListener('DOMContentLoaded', function() {
+        const form = document.getElementById('importForm');
+        const importBtn = document.getElementById('importBtn');
+        const fileInput = document.getElementById('import_file');
 
-    form.addEventListener('submit', function(e) {
-        if (!fileInput.files.length) {
-            e.preventDefault();
-            alert('Pilih file terlebih dahulu!');
-            return;
-        }
-
-        // Show loading state
-        importBtn.innerHTML = '<i class="mdi mdi-loading mdi-spin mr-2"></i>Mengimport...';
-        importBtn.disabled = true;
-    });
-
-    // File validation
-    fileInput.addEventListener('change', function() {
-        const file = this.files[0];
-        if (file) {
-            // Check file size (2MB max)
-            if (file.size > 2 * 1024 * 1024) {
-                alert('Ukuran file terlalu besar. Maksimal 2MB.');
-                this.value = '';
+        form.addEventListener('submit', function(e) {
+            if (!fileInput.files.length) {
+                e.preventDefault();
+                alert('Pilih file terlebih dahulu!');
                 return;
             }
 
-            // Check file extension
-            const allowedExtensions = ['csv', 'xlsx', 'xls'];
-            const fileExtension = file.name.split('.').pop().toLowerCase();
-            
-            if (!allowedExtensions.includes(fileExtension)) {
-                alert('Format file tidak didukung. Gunakan CSV, XLSX, atau XLS.');
-                this.value = '';
-                return;
+            // Show loading state
+            importBtn.innerHTML = '<i class="mdi mdi-loading mdi-spin mr-2"></i>Mengimport...';
+            importBtn.disabled = true;
+        });
+
+        // File validation
+        fileInput.addEventListener('change', function() {
+            const file = this.files[0];
+            if (file) {
+                // Check file size (2MB max)
+                if (file.size > 2 * 1024 * 1024) {
+                    alert('Ukuran file terlalu besar. Maksimal 2MB.');
+                    this.value = '';
+                    return;
+                }
+
+                // Check file extension
+                const allowedExtensions = ['xlsx'];
+                const fileExtension = file.name.split('.').pop().toLowerCase();
+
+                if (!allowedExtensions.includes(fileExtension)) {
+                    alert('Format file tidak didukung. Gunakan XLSX saja.');
+                    this.value = '';
+                    return;
+                }
             }
-        }
+        });
     });
-});
 </script>
 
 @endsection

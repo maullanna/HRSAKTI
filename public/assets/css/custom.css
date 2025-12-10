@@ -1,0 +1,438 @@
+/* Custom CSS for HRSAKTI - Logo & Layout Fixes */
+
+/* Logo Fix - Prevent overflow and ensure proper sizing */
+.topbar-left .logo img {
+    max-height: 50px !important;
+    max-width: 200px !important;
+    height: auto !important;
+    object-fit: contain !important;
+    vertical-align: top !important;
+    display: block !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: none !important;
+    outline: none !important;
+}
+
+/* Logo container spacing */
+.topbar-left .logo {
+    display: block;
+    line-height: 70px;
+    vertical-align: top !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+/* Fix white line below logo - remove any spacing and ensure proper alignment */
+.topbar-left {
+    overflow: hidden !important;
+    vertical-align: top !important;
+    line-height: 70px !important;
+    height: 70px !important;
+}
+
+.topbar-left a.logo {
+    display: flex !important;
+    align-items: center !important;
+    height: 70px !important;
+    line-height: 70px !important;
+    margin: 0 !important;
+    padding: 0 15px !important;
+    vertical-align: top !important;
+    border: none !important;
+    outline: none !important;
+    box-shadow: none !important;
+}
+
+.topbar-left a.logo:focus,
+.topbar-left a.logo:hover {
+    border: none !important;
+    outline: none !important;
+    box-shadow: none !important;
+}
+
+/* Fix white line/gap between topbar-left and navbar-custom */
+.topbar {
+    margin: 0 !important;
+    padding: 0 !important;
+    border: none !important;
+    box-shadow: none !important;
+}
+
+.topbar-left {
+    margin-bottom: 0 !important;
+    padding-bottom: 0 !important;
+    border-bottom: none !important;
+    border: none !important;
+}
+
+/* Fix garis di bawah logo HRS - khusus untuk employee */
+.topbar .topbar-left {
+    border-bottom: none !important;
+    border: none !important;
+}
+
+.topbar .topbar-left::after {
+    display: none !important;
+    content: none !important;
+}
+
+.topbar .topbar-left::before {
+    display: none !important;
+    content: none !important;
+}
+
+/* Pastikan tidak ada pseudo-element yang menambahkan garis pada topbar-left */
+.topbar .topbar-left::after,
+.topbar .topbar-left::before {
+    display: none !important;
+    content: none !important;
+    border: none !important;
+}
+
+.navbar-custom {
+    margin-top: 0 !important;
+    padding-top: 0 !important;
+    border-top: none !important;
+}
+
+/* Ensure no gap between topbar elements */
+.topbar > * {
+    vertical-align: top !important;
+    margin: 0 !important;
+}
+
+/* System Name Text Styling */
+.logo-text {
+    font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif !important;
+    font-size: 1.5em !important;
+    font-weight: 700 !important;
+    color: #ffffff !important;
+    white-space: nowrap !important;
+    letter-spacing: 0.5px !important;
+    text-transform: none !important;
+    background: transparent !important;
+    -webkit-background-clip: initial !important;
+    -webkit-text-fill-color: #ffffff !important;
+    background-clip: initial !important;
+    animation: fadeIn 0.5s ease-in;
+    display: inline-block !important;
+    vertical-align: middle !important;
+    line-height: 1 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: none !important;
+    outline: none !important;
+    box-shadow: none !important;
+    text-decoration: none !important;
+}
+
+/* Animation */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateX(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+/* Hover effect */
+.logo-text:hover {
+    transform: scale(1.05);
+    transition: transform 0.3s ease;
+}
+
+/* Responsive - Mobile */
+@media (max-width: 768px) {
+    .logo-text {
+        font-size: 1.1em !important;
+        letter-spacing: 0.3px !important;
+    }
+}
+
+/* ============================================
+   MOBILE RESPONSIVE IMPROVEMENTS
+   ============================================ */
+
+@media (max-width: 768px) {
+    /* Topbar adjustments - Full width di mobile */
+    .topbar-left {
+        width: 0 !important;
+        min-width: 0 !important;
+        display: none !important;
+        padding: 0 !important;
+        margin: 0 !important;
+    }
+
+    .topbar-left .logo img {
+        max-width: 50px !important;
+        max-height: 40px !important;
+    }
+
+    .navbar-custom {
+        margin-left: 0 !important;
+        width: 100% !important;
+        padding-left: 0 !important;
+    }
+
+    /* Topbar full width di mobile */
+    .topbar {
+        padding-left: 0 !important;
+    }
+
+    /* Profile photo di header lebih kecil */
+    .nav-pro-img img {
+        width: 35px !important;
+        height: 35px !important;
+    }
+
+    /* Cards responsive */
+    .card {
+        margin-bottom: 15px !important;
+    }
+
+    .card-body {
+        padding: 15px !important;
+    }
+
+    /* Tables responsive */
+    .table-responsive {
+        overflow-x: auto !important;
+        -webkit-overflow-scrolling: touch !important;
+    }
+
+    /* Buttons lebih kecil di mobile */
+    .btn {
+        padding: 8px 12px !important;
+        font-size: 13px !important;
+    }
+
+    .btn-sm {
+        padding: 6px 10px !important;
+        font-size: 12px !important;
+    }
+
+    /* Forms responsive */
+    .form-control {
+        font-size: 14px !important;
+    }
+
+    /* Breadcrumb responsive */
+    .breadcrumb {
+        font-size: 12px !important;
+        padding: 8px 10px !important;
+    }
+
+    .page-title {
+        font-size: 18px !important;
+        margin-bottom: 10px !important;
+    }
+
+    /* Footer */
+    .footer {
+        left: 0 !important;
+        width: 100% !important;
+        padding: 15px !important;
+        font-size: 12px !important;
+    }
+}
+
+/* Language Switch Active State */
+.language-switch .dropdown-item.active {
+    background-color: #f8f9fa;
+    color: #495057;
+    font-weight: 500;
+}
+
+.language-switch .dropdown-item:hover {
+    background-color: #e9ecef;
+}
+
+.language-switch .dropdown-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+}
+
+.language-switch .dropdown-item img {
+    flex-shrink: 0;
+}
+
+/* Mobile Small - Extra small devices */
+@media (max-width: 480px) {
+    /* Topbar lebih compact */
+    .topbar {
+        height: 60px !important;
+    }
+
+    .topbar-left {
+        width: 0 !important;
+        height: 0 !important;
+        display: none !important;
+    }
+
+    .topbar-left .logo {
+        line-height: 60px !important;
+    }
+
+    .navbar-custom {
+        margin-left: 0 !important;
+        width: 100% !important;
+    }
+
+    .button-menu-mobile {
+        line-height: 60px !important;
+        padding: 0 10px !important;
+    }
+
+    /* Content padding lebih kecil */
+    .content-page .content {
+        padding: 5px !important;
+        margin-left: 0 !important;
+        margin-right: 0 !important;
+    }
+
+    .content-page .container-fluid {
+        padding: 5px !important;
+        margin-left: 0 !important;
+        margin-right: 0 !important;
+        width: 100% !important;
+        max-width: 100% !important;
+    }
+
+    /* Cards lebih compact */
+    .card-body {
+        padding: 10px !important;
+    }
+
+    /* Typography adjustments */
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+        font-size: 90% !important;
+    }
+
+    /* Tables - font lebih kecil */
+    table {
+        font-size: 12px !important;
+    }
+
+    table th,
+    table td {
+        padding: 8px 6px !important;
+    }
+
+    /* Buttons stack di mobile */
+    .btn-group {
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+    }
+
+    .btn-group .btn {
+        width: 100%;
+        margin-bottom: 5px;
+    }
+
+    /* Modal responsive */
+    .modal-dialog {
+        margin: 10px !important;
+        max-width: calc(100% - 20px) !important;
+    }
+
+    .modal-content {
+        padding: 15px !important;
+    }
+
+    /* Profile photo di header */
+    .nav-pro-img img {
+        width: 30px !important;
+        height: 30px !important;
+    }
+}
+
+/* Mobile Extra Small */
+@media (max-width: 360px) {
+    .topbar-left {
+        width: 0 !important;
+        display: none !important;
+    }
+
+    .navbar-custom {
+        margin-left: 0 !important;
+        width: 100% !important;
+    }
+
+    .content-page {
+        margin-left: 0 !important;
+        padding-left: 0 !important;
+        padding-right: 0 !important;
+    }
+
+    .content-page .content {
+        margin-left: 0 !important;
+        margin-right: 0 !important;
+    }
+
+    .content-page .container-fluid {
+        padding: 5px !important;
+        margin-left: 0 !important;
+        margin-right: 0 !important;
+        width: 100% !important;
+        max-width: 100% !important;
+    }
+
+    .card-body {
+        padding: 8px !important;
+    }
+
+    .btn {
+        padding: 6px 10px !important;
+        font-size: 11px !important;
+    }
+}
+
+/* Tablet adjustments */
+@media (min-width: 769px) and (max-width: 1024px) {
+    .content-page {
+        margin-left: 240px !important;
+    }
+
+    .content-page .container-fluid {
+        padding: 15px !important;
+    }
+
+    .card-body {
+        padding: 20px !important;
+    }
+}
+
+/* Touch-friendly untuk mobile */
+@media (max-width: 768px) {
+    /* Touch targets minimal 44x44px */
+    a,
+    button,
+    .btn {
+        min-height: 44px !important;
+        min-width: 44px !important;
+    }
+
+    /* Dropdown items lebih besar */
+    .dropdown-item {
+        padding: 12px 20px !important;
+        font-size: 14px !important;
+    }
+
+    /* Input fields lebih besar untuk touch */
+    .form-control {
+        min-height: 44px !important;
+        padding: 10px 15px !important;
+    }
+}

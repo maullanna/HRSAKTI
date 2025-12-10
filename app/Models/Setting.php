@@ -9,15 +9,18 @@ class Setting extends Model
 {
     use HasFactory;
 
+    protected $primaryKey = 'id_setting';
+    public $incrementing = true;
+    protected $keyType = 'int';
+
+    public function getRouteKeyName()
+    {
+        return 'id_setting';
+    }
+
     protected $fillable = [
-        'key', 'value', 'description'
+        'key',
+        'value',
+        'description'
     ];
 }
-
-
-
-
-
-
-
-

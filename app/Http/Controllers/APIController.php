@@ -72,10 +72,12 @@ class ApiController extends Controller
                     $attendance->attendance_time = date("H:i:s");
                     $attendance->attendance_date = date("Y-m-d");
 
-                    if (!($employee->schedules->first()->time_in >= $attendance->attendance_time)) {
-                        $attendance->status = 0;
-                        AttendanceController::lateTime($employee);
-                    };
+                    // Schedule check removed - status set to 1 (on-time) by default
+                    // if (!($employee->schedules->first()->time_in >= $attendance->attendance_time)) {
+                    //     $attendance->status = 0;
+                    //     AttendanceController::lateTime($employee);
+                    // }
+                    $attendance->status = 1; // Default to on-time since schedule is removed
 
                     $attendance->save();
                  } else {
@@ -103,12 +105,13 @@ class ApiController extends Controller
                     $leave->emp_id = $employee->id;
                     $leave->leave_time = date("H:i:s");
                     $leave->leave_date = date("Y-m-d");
-                    // ontime + overtime if true , else "early go" ....
-                    if ($leave->leave_time >= $employee->schedules->first()->time_out) {
-                        leaveController::overTime($employee);
-                    } else {
-                        $leave->status = 0;
-                    }
+                    // Schedule check removed - overtime calculation disabled
+                    // if ($leave->leave_time >= $employee->schedules->first()->time_out) {
+                    //     leaveController::overTime($employee);
+                    // } else {
+                    //     $leave->status = 0;
+                    // }
+                    $leave->status = 'pending'; // Default status
 
                     $leave->save();
                 } else {

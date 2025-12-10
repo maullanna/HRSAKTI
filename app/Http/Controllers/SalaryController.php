@@ -23,7 +23,7 @@ class SalaryController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'employee_id' => 'required|exists:employees,id',
+            'employee_id' => 'required|exists:employees,id_employees',
             'month' => 'required|date',
             'basic_salary' => 'required|numeric|min:0',
             'allowances' => 'nullable|array',
@@ -36,12 +36,12 @@ class SalaryController extends Controller
         $salary->basic_salary = $request->basic_salary;
         $salary->allowances = $request->allowances ?? [];
         $salary->deductions = $request->deductions ?? [];
-        
+
         // Calculate net salary
         $totalAllowances = array_sum($salary->allowances ?? []);
         $totalDeductions = array_sum($salary->deductions ?? []);
         $salary->net_salary = $salary->basic_salary + $totalAllowances - $totalDeductions;
-        
+
         $salary->save();
 
         return redirect()->route('salaries.index')->with('success', 'Salary record created successfully.');
@@ -62,7 +62,7 @@ class SalaryController extends Controller
     public function update(Request $request, Salary $salary)
     {
         $request->validate([
-            'employee_id' => 'required|exists:employees,id',
+            'employee_id' => 'required|exists:employees,id_employees',
             'month' => 'required|date',
             'basic_salary' => 'required|numeric|min:0',
             'allowances' => 'nullable|array',
@@ -74,12 +74,12 @@ class SalaryController extends Controller
         $salary->basic_salary = $request->basic_salary;
         $salary->allowances = $request->allowances ?? [];
         $salary->deductions = $request->deductions ?? [];
-        
+
         // Calculate net salary
         $totalAllowances = array_sum($salary->allowances ?? []);
         $totalDeductions = array_sum($salary->deductions ?? []);
         $salary->net_salary = $salary->basic_salary + $totalAllowances - $totalDeductions;
-        
+
         $salary->save();
 
         return redirect()->route('salaries.index')->with('success', 'Salary record updated successfully.');

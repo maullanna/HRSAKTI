@@ -23,7 +23,7 @@ class TrainingController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'employee_id' => 'required|exists:employees,id',
+            'employee_id' => 'required|exists:employees,id_employees',
             'title' => 'required|string|max:255',
             'category' => 'required|string|max:100',
             'start_date' => 'required|date',
@@ -60,7 +60,7 @@ class TrainingController extends Controller
     public function update(Request $request, Training $training)
     {
         $request->validate([
-            'employee_id' => 'required|exists:employees,id',
+            'employee_id' => 'required|exists:employees,id_employees',
             'title' => 'required|string|max:255',
             'category' => 'required|string|max:100',
             'start_date' => 'required|date',

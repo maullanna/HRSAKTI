@@ -1,30 +1,30 @@
 @extends('layouts.master')
 
 @section('css')
-    <!-- Table css -->
-    <link href="{{ URL::asset('plugins/RWD-Table-Patterns/dist/css/rwd-table.min.css') }}" rel="stylesheet"
-        type="text/css" media="screen">
+<!-- Table css -->
+<link href="{{ URL::asset('plugins/RWD-Table-Patterns/dist/css/rwd-table.min.css') }}" rel="stylesheet"
+    type="text/css" media="screen">
 @endsection
 
 @section('breadcrumb')
-    <div class="col-sm-6">
-        <h4 class="page-title text-left">Salaries (Slip Gaji)</h4>
-        <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="javascript:void(0);">Home</a></li>
-            <li class="breadcrumb-item"><a href="javascript:void(0);">Salaries</a></li>
-        </ol>
-    </div>
+<div class="col-sm-6">
+    <h4 class="page-title text-left">Salaries (Slip Gaji)</h4>
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="javascript:void(0);">Home</a></li>
+        <li class="breadcrumb-item"><a href="javascript:void(0);">Salaries</a></li>
+    </ol>
+</div>
 @endsection
 
 @section('button')
-    <div class="btn-group" role="group">
-        <a href="{{ route('salaries.create') }}" class="btn btn-primary btn-sm btn-flat">
-            <i class="mdi mdi-plus mr-2"></i>Add New Salary
-        </a>
-        <a href="{{ route('salaries.import') }}" class="btn btn-success btn-sm btn-flat">
-            <i class="mdi mdi-upload mr-2"></i>Import Salaries
-        </a>
-    </div>
+<div class="btn-group" role="group">
+    <a href="{{ route('salaries.create') }}" class="btn btn-primary btn-sm btn-flat">
+        <i class="mdi mdi-plus mr-2"></i>Add New Salary
+    </a>
+    <a href="{{ route('salaries.import') }}" class="btn btn-success btn-sm btn-flat">
+        <i class="mdi mdi-upload mr-2"></i>Import Salaries
+    </a>
+</div>
 @endsection
 
 @section('content')
@@ -53,44 +53,44 @@
                                 <tr>
                                     <td>
                                         <strong>{{ $salary->employee->name }}</strong><br>
-                                        <small class="text-muted">ID: {{ $salary->employee->id }}</small>
+                                        <small class="text-muted">ID: {{ $salary->employee->id_employees }}</small>
                                     </td>
                                     <td>{{ \Carbon\Carbon::parse($salary->month)->format('F Y') }}</td>
                                     <td>Rp {{ number_format($salary->basic_salary, 0, ',', '.') }}</td>
                                     <td>
                                         @if(is_array($salary->allowances) && count($salary->allowances) > 0)
-                                            @foreach($salary->allowances as $key => $value)
-                                                <small>{{ $key }}: Rp {{ number_format($value, 0, ',', '.') }}</small><br>
-                                            @endforeach
+                                        @foreach($salary->allowances as $key => $value)
+                                        <small>{{ $key }}: Rp {{ number_format($value, 0, ',', '.') }}</small><br>
+                                        @endforeach
                                         @else
-                                            <span class="text-muted">-</span>
+                                        <span class="text-muted">-</span>
                                         @endif
                                     </td>
                                     <td>
                                         @if(is_array($salary->deductions) && count($salary->deductions) > 0)
-                                            @foreach($salary->deductions as $key => $value)
-                                                <small>{{ $key }}: Rp {{ number_format($value, 0, ',', '.') }}</small><br>
-                                            @endforeach
+                                        @foreach($salary->deductions as $key => $value)
+                                        <small>{{ $key }}: Rp {{ number_format($value, 0, ',', '.') }}</small><br>
+                                        @endforeach
                                         @else
-                                            <span class="text-muted">-</span>
+                                        <span class="text-muted">-</span>
                                         @endif
                                     </td>
                                     <td>
                                         <strong class="text-success">Rp {{ number_format($salary->net_salary, 0, ',', '.') }}</strong>
                                     </td>
                                     <td>
-                                        <div class="btn-group" role="group">
-                                            <a href="{{ route('salaries.show', $salary) }}" class="btn btn-info btn-sm">
-                                                <i class="mdi mdi-eye"></i>
+                                        <div class="action-buttons">
+                                            <a href="{{ route('salaries.show', $salary) }}" class="btn btn-info" title="View Details" data-toggle="tooltip" data-placement="top">
+                                                <i class="mdi mdi-eye-outline"></i>
                                             </a>
-                                            <a href="{{ route('salaries.edit', $salary) }}" class="btn btn-warning btn-sm">
-                                                <i class="mdi mdi-pencil"></i>
+                                            <a href="{{ route('salaries.edit', $salary) }}" class="btn btn-warning" title="Edit" data-toggle="tooltip" data-placement="top">
+                                                <i class="mdi mdi-pencil-outline"></i>
                                             </a>
-                                            <form action="{{ route('salaries.destroy', $salary) }}" method="POST" style="display: inline-block;" onsubmit="return confirm('Are you sure you want to delete this salary record?')">
+                                            <form action="{{ route('salaries.destroy', $salary) }}" method="POST">
                                                 @csrf
                                                 @method('DELETE')
-                                                <button type="submit" class="btn btn-danger btn-sm">
-                                                    <i class="mdi mdi-delete"></i>
+                                                <button type="submit" class="btn btn-danger" title="Delete" data-toggle="tooltip" data-placement="top" onclick="return confirm('Are you sure you want to delete this salary record?')">
+                                                    <i class="mdi mdi-delete-outline"></i>
                                                 </button>
                                             </form>
                                         </div>
@@ -117,5 +117,23 @@
         </div>
     </div>
 </div>
+@endsection
 
+@section('script')
+<script>
+    $(document).ready(function() {
+        // Initialize tooltips
+        $('[data-toggle="tooltip"]').tooltip();
+
+        // Initialize DataTable
+        $('#datatable-buttons').DataTable({
+            destroy: true,
+            responsive: true,
+            pageLength: 25,
+            order: [
+                [0, 'desc']
+            ]
+        });
+    });
+</script>
 @endsection

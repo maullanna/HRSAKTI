@@ -38,8 +38,11 @@
     },
 
     MainApp.prototype.initMetisMenu = function () {
-        //metis menu
-        $("#side-menu").metisMenu();
+        //metis menu - dengan toggle: true agar menu lain tertutup saat menu baru dibuka
+        $("#side-menu").metisMenu({
+            toggle: true,
+            preventDefault: true
+        });
     },
 
     MainApp.prototype.initLeftMenuCollapse = function () {

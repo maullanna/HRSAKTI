@@ -8,17 +8,17 @@
     <meta content="Themesbrand" name="author" />
     <link rel="shortcut icon" href="assets/images/">
     <link href="{{ URL::asset('assets/css/attendanceFront.css') }}" rel="stylesheet" type="text/css" />
-    
-    @include('layouts.head')
+
+    <?php echo $__env->make('layouts.head', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?>
 </head>
 
 <body class="pb-0" style="background:#2a3142;">
-  
-    @yield('content')
-    @include('layouts.footer-script')
-    @include('includes.flash')
+
+    <?php echo $__env->yieldContent('content'); ?>
+    <?php echo $__env->make('layouts.footer-script', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?>
+    <?php echo $__env->make('includes.flash', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?>
     <script src="{{ URL::asset('assets/js/attendanceFront.js') }}"></script>
-   
+
 </body>
 
 </html>

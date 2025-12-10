@@ -8,6 +8,12 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+use PhpOffice\PhpSpreadsheet\Style\Fill;
+use PhpOffice\PhpSpreadsheet\Style\Alignment;
+use PhpOffice\PhpSpreadsheet\Style\Border;
+use PhpOffice\PhpSpreadsheet\IOFactory;
 
 class ImportController extends Controller
 {
@@ -19,19 +25,14 @@ class ImportController extends Controller
     public function importSalaries(Request $request)
     {
         $request->validate([
-            'import_file' => 'required|file|mimes:csv,xlsx,xls|max:2048'
+            'import_file' => 'required|file|mimes:xlsx|max:2048' // Only XLSX
         ]);
 
         try {
             $file = $request->file('import_file');
-            $extension = $file->getClientOriginalExtension();
             
-            // Read file based on extension
-            if ($extension === 'csv') {
-                $data = $this->readCsvFile($file);
-            } else {
-                $data = $this->readExcelFile($file);
-            }
+            // Only read Excel file (XLSX)
+            $data = $this->readExcelFile($file);
 
             if (empty($data)) {
                 return back()->with('error', 'File kosong atau tidak dapat dibaca.');
@@ -55,62 +56,80 @@ class ImportController extends Controller
         }
     }
 
-    private function readCsvFile($file)
-    {
-        $data = [];
-        $handle = fopen($file->getPathname(), 'r');
-        
-        // Skip header row
-        $header = fgetcsv($handle);
-        
-        while (($row = fgetcsv($handle)) !== false) {
-            if (count($row) >= 3) { // Minimum required columns
-                $data[] = [
-                    'employee_id' => trim($row[0]),
-                    'month' => trim($row[1]),
-                    'basic_salary' => trim($row[2]),
-                    'allowances' => isset($row[3]) ? trim($row[3]) : '',
-                    'deductions' => isset($row[4]) ? trim($row[4]) : '',
-                ];
-            }
-        }
-        
-        fclose($handle);
-        return $data;
-    }
-
     private function readExcelFile($file)
     {
-        // For Excel files, we'll use a simple approach
-        // In production, you might want to use PhpSpreadsheet
-        $data = [];
-        
-        // Move file to temp location
-        $tempPath = $file->store('temp');
-        $fullPath = storage_path('app/' . $tempPath);
-        
-        // Simple CSV conversion (this is basic - for production use PhpSpreadsheet)
-        if (($handle = fopen($fullPath, 'r')) !== false) {
-            $header = fgetcsv($handle);
-            
-            while (($row = fgetcsv($handle)) !== false) {
-                if (count($row) >= 3) {
-                    $data[] = [
-                        'employee_id' => trim($row[0]),
-                        'month' => trim($row[1]),
-                        'basic_salary' => trim($row[2]),
-                        'allowances' => isset($row[3]) ? trim($row[3]) : '',
-                        'deductions' => isset($row[4]) ? trim($row[4]) : '',
-                    ];
+        try {
+            $spreadsheet = IOFactory::load($file->getPathname());
+            $sheet = $spreadsheet->getActiveSheet();
+            $data = [];
+
+            // Get highest row and column
+            $highestRow = $sheet->getHighestRow();
+            $highestColumn = $sheet->getHighestColumn();
+
+            if ($highestRow < 2) {
+                return [];
+            }
+
+            // Read header row (first row)
+            $header = [];
+            for ($col = 'A'; $col <= $highestColumn; $col++) {
+                $cellValue = $sheet->getCell($col . '1')->getValue();
+                if ($cellValue) {
+                    $header[] = strtolower(trim($cellValue));
+                } else {
+                    break;
                 }
             }
-            fclose($handle);
+
+            if (empty($header)) {
+                return [];
+            }
+
+            // Read data rows (starting from row 2)
+            for ($row = 2; $row <= $highestRow; $row++) {
+                $firstCell = $sheet->getCell('A' . $row)->getValue();
+
+                // Skip instruction rows
+                if (
+                    stripos((string)$firstCell, 'Catatan') !== false ||
+                    stripos((string)$firstCell, 'Kolom wajib') !== false ||
+                    stripos((string)$firstCell, 'Format') !== false
+                ) {
+                    continue;
+                }
+
+                $rowData = [];
+                $hasData = false;
+
+                $colIndex = 0;
+                for ($col = 'A'; $col <= $highestColumn && $colIndex < count($header); $col++) {
+                    $cellValue = $sheet->getCell($col . $row)->getValue();
+
+                    // Handle formula results
+                    if ($cellValue instanceof \PhpOffice\PhpSpreadsheet\RichText\RichText) {
+                        $cellValue = $cellValue->getPlainText();
+                    }
+
+                    $rowData[$header[$colIndex]] = $cellValue ? trim((string)$cellValue) : '';
+
+                    if (!empty($rowData[$header[$colIndex]])) {
+                        $hasData = true;
+                    }
+
+                    $colIndex++;
+                }
+
+                // Only add row if it has at least some data
+                if ($hasData && count($rowData) > 0) {
+                    $data[] = $rowData;
+                }
+            }
+
+            return $data;
+        } catch (\Exception $e) {
+            throw new \Exception('Gagal membaca file Excel: ' . $e->getMessage());
         }
-        
-        // Clean up temp file
-        unlink($fullPath);
-        
-        return $data;
     }
 
     private function validateImportData($data)
@@ -269,35 +288,152 @@ class ImportController extends Controller
 
     public function downloadTemplate()
     {
-        $headers = [
-            'Content-Type' => 'text/csv',
-            'Content-Disposition' => 'attachment; filename="salary_import_template.csv"',
-        ];
+        try {
+            $spreadsheet = new Spreadsheet();
+            $sheet = $spreadsheet->getActiveSheet();
 
-        $callback = function() {
-            $file = fopen('php://output', 'w');
-            
+            // Set title
+            $sheet->setTitle('Salary Import Template');
+
             // Header row
-            fputcsv($file, [
+            $headers = [
                 'employee_id',
                 'month',
                 'basic_salary',
                 'allowances',
                 'deductions'
-            ]);
+            ];
+
+            $headerDisplay = [
+                'Employee ID',
+                'Month (YYYY-MM)',
+                'Basic Salary',
+                'Allowances (JSON)',
+                'Deductions (JSON)'
+            ];
+
+            // Set header values
+            $column = 'A';
+            foreach ($headers as $index => $header) {
+                $sheet->setCellValue($column . '1', $header);
+                $column++;
+            }
+
+            // Style untuk header dengan warna yang lebih menarik
+            $headerStyle = [
+                'font' => [
+                    'bold' => true,
+                    'color' => ['rgb' => 'FFFFFF'],
+                    'size' => 11,
+                ],
+                'fill' => [
+                    'fillType' => Fill::FILL_SOLID,
+                    'startColor' => ['rgb' => '2E75B6'], // Blue color
+                ],
+                'alignment' => [
+                    'horizontal' => Alignment::HORIZONTAL_CENTER,
+                    'vertical' => Alignment::VERTICAL_CENTER,
+                    'wrapText' => true,
+                ],
+                'borders' => [
+                    'allBorders' => [
+                        'borderStyle' => Border::BORDER_MEDIUM,
+                        'color' => ['rgb' => '1F4E78'],
+                    ],
+                ],
+            ];
+
+            $sheet->getStyle('A1:E1')->applyFromArray($headerStyle);
+            $sheet->getRowDimension('1')->setRowHeight(30);
+
+            // Set column widths dengan spacing yang lebih baik
+            $columnWidths = [
+                'A' => 18,  // Employee ID
+                'B' => 20,  // Month
+                'C' => 18,  // Basic Salary
+                'D' => 35,  // Allowances
+                'E' => 35,  // Deductions
+            ];
+
+            foreach ($columnWidths as $col => $width) {
+                $sheet->getColumnDimension($col)->setWidth($width);
+            }
 
             // Sample data row
-            fputcsv($file, [
+            $row2 = [
                 '1',
                 '2024-01',
                 '5000000',
                 '{"transport": 500000, "meal": 300000}',
                 '{"tax": 500000, "insurance": 200000}'
-            ]);
+            ];
 
-            fclose($file);
-        };
+            $column = 'A';
+            foreach ($row2 as $value) {
+                $sheet->setCellValue($column . '2', $value);
+                $column++;
+            }
 
-        return response()->stream($callback, 200, $headers);
+            // Style untuk data rows dengan spacing yang lebih baik
+            $dataStyle = [
+                'alignment' => [
+                    'horizontal' => Alignment::HORIZONTAL_LEFT,
+                    'vertical' => Alignment::VERTICAL_CENTER,
+                    'wrapText' => true,
+                ],
+                'borders' => [
+                    'allBorders' => [
+                        'borderStyle' => Border::BORDER_THIN,
+                        'color' => ['rgb' => 'D0D0D0'],
+                    ],
+                ],
+                'fill' => [
+                    'fillType' => Fill::FILL_SOLID,
+                    'startColor' => ['rgb' => 'FFFFFF'],
+                ],
+            ];
+
+            $sheet->getStyle('A2:E2')->applyFromArray($dataStyle);
+            $sheet->getRowDimension('2')->setRowHeight(25);
+
+            // Freeze header row
+            $sheet->freezePane('A2');
+
+            // Add note/instruction row
+            $sheet->setCellValue('A3', 'Catatan:');
+            $sheet->mergeCells('A3:E3');
+            $sheet->getStyle('A3')->getFont()->setBold(true)->setSize(11);
+            $sheet->getStyle('A3')->getFill()
+                ->setFillType(Fill::FILL_SOLID)
+                ->getStartColor()->setRGB('FFF3CD');
+
+            $sheet->setCellValue('A4', '1. Kolom wajib: Employee ID, Month, Basic Salary');
+            $sheet->mergeCells('A4:E4');
+            $sheet->setCellValue('A5', '2. Format month: YYYY-MM (contoh: 2024-01)');
+            $sheet->mergeCells('A5:E5');
+            $sheet->setCellValue('A6', '3. Allowances dan Deductions: Format JSON (opsional)');
+            $sheet->mergeCells('A6:E6');
+            $sheet->getStyle('A4:A6')->getFont()->setSize(10);
+            $sheet->getRowDimension('3')->setRowHeight(20);
+            $sheet->getRowDimension('4')->setRowHeight(18);
+            $sheet->getRowDimension('5')->setRowHeight(18);
+            $sheet->getRowDimension('6')->setRowHeight(18);
+
+            // Create writer
+            $writer = new Xlsx($spreadsheet);
+
+            // Save to temporary file
+            $filename = 'salary_import_template.xlsx';
+            $tempFile = tempnam(sys_get_temp_dir(), 'salary_template');
+            $writer->save($tempFile);
+
+            // Return file download
+            return response()->download($tempFile, $filename, [
+                'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            ])->deleteFileAfterSend(true);
+        } catch (\Exception $e) {
+            return redirect()->back()
+                ->with('error', 'Gagal membuat template Excel: ' . $e->getMessage());
+        }
     }
 }

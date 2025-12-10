@@ -1,7 +1,7 @@
 @extends('layouts.master')
 
 @section('title')
-    Leave Request Details
+Leave Request Details
 @endsection
 
 @section('content')
@@ -12,7 +12,7 @@
                 <h4 class="card-title">Leave Request Details</h4>
                 <div class="float-right">
                     <a href="{{ route('leave.index') }}" class="btn btn-secondary">Back to List</a>
-                    <a href="{{ route('leave.edit', $leave) }}" class="btn btn-warning">Edit</a>
+                    <a href="{{ route('leave.edit', $leave->id_leave) }}" class="btn btn-warning">Edit</a>
                 </div>
             </div>
             <div class="card-body">
@@ -23,7 +23,7 @@
                         <table class="table table-borderless">
                             <tr>
                                 <th width="30%">ID:</th>
-                                <td>{{ $leave->id }}</td>
+                                <td>{{ $leave->id_leave }}</td>
                             </tr>
                             <tr>
                                 <th>Employee:</th>
@@ -96,4 +96,3 @@
     </div>
 </div>
 @endsection
-

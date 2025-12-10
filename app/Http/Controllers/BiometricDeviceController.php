@@ -157,10 +157,12 @@ class BiometricDeviceController extends Controller
                     $att_table->attendance_date = date('Y-m-d', strtotime($value['timestamp']));
                     $att_table->type = $value['type'];
 
-                    if (!($employee->schedules->first()->time_in >= $att_table->attendance_time)) {
-                        $att_table->status = 0;
-                        AttendanceController::lateTimeDevice($value['timestamp'],$employee);
-                    }
+                    // Schedule check removed - status set to 1 (on-time) by default
+                    // if (!($employee->schedules->first()->time_in >= $att_table->attendance_time)) {
+                    //     $att_table->status = 0;
+                    //     AttendanceController::lateTimeDevice($value['timestamp'],$employee);
+                    // }
+                    $att_table->status = 1; // Default to on-time since schedule is removed
                     $att_table->save();
                 }
             }
@@ -183,13 +185,13 @@ class BiometricDeviceController extends Controller
                     $lve_table->leave_date = date('Y-m-d', strtotime($value['timestamp']));
                     $lve_table->type = $value['type'];
 
-                    if (!($employee->schedules->first()->time_out<=$lve_table->leave_time)) {
-                        $lve_table->status = 0;
-                        
-                    } 
-                    else {
-                        leaveController::overTimeDevice($value['timestamp'],$employee);
-                    }
+                    // Schedule check removed - overtime calculation disabled
+                    // if (!($employee->schedules->first()->time_out<=$lve_table->leave_time)) {
+                    //     $lve_table->status = 0;
+                    // } else {
+                    //     leaveController::overTimeDevice($value['timestamp'],$employee);
+                    // }
+                    $lve_table->status = 'approved'; // Default status
                     $lve_table->save();
                 }
             }

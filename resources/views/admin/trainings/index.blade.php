@@ -1,25 +1,25 @@
 @extends('layouts.master')
 
 @section('css')
-    <!-- Table css -->
-    <link href="{{ URL::asset('plugins/RWD-Table-Patterns/dist/css/rwd-table.min.css') }}" rel="stylesheet"
-        type="text/css" media="screen">
+<!-- Table css -->
+<link href="{{ URL::asset('plugins/RWD-Table-Patterns/dist/css/rwd-table.min.css') }}" rel="stylesheet"
+    type="text/css" media="screen">
 @endsection
 
 @section('breadcrumb')
-    <div class="col-sm-6">
-        <h4 class="page-title text-left">Trainings</h4>
-        <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="javascript:void(0);">Home</a></li>
-            <li class="breadcrumb-item"><a href="javascript:void(0);">Trainings</a></li>
-        </ol>
-    </div>
+<div class="col-sm-6">
+    <h4 class="page-title text-left">Trainings</h4>
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="javascript:void(0);">Home</a></li>
+        <li class="breadcrumb-item"><a href="javascript:void(0);">Trainings</a></li>
+    </ol>
+</div>
 @endsection
 
 @section('button')
-    <a href="{{ route('trainings.create') }}" class="btn btn-primary btn-sm btn-flat">
-        <i class="mdi mdi-plus mr-2"></i>Add New Training
-    </a>
+<a href="{{ route('trainings.create') }}" class="btn btn-primary btn-sm btn-flat">
+    <i class="mdi mdi-plus mr-2"></i>Add New Training
+</a>
 @endsection
 
 @section('content')
@@ -48,7 +48,7 @@
                                 <tr>
                                     <td>
                                         <strong>{{ $training->employee->name }}</strong><br>
-                                        <small class="text-muted">ID: {{ $training->employee->id }}</small>
+                                        <small class="text-muted">ID: {{ $training->employee->id_employees }}</small>
                                     </td>
                                     <td>{{ $training->title }}</td>
                                     <td>
@@ -58,35 +58,35 @@
                                     <td>{{ \Carbon\Carbon::parse($training->end_date)->format('d M Y') }}</td>
                                     <td>
                                         @switch($training->status)
-                                            @case('planned')
-                                                <span class="badge badge-secondary">Planned</span>
-                                                @break
-                                            @case('ongoing')
-                                                <span class="badge badge-warning">Ongoing</span>
-                                                @break
-                                            @case('completed')
-                                                <span class="badge badge-success">Completed</span>
-                                                @break
-                                            @case('cancelled')
-                                                <span class="badge badge-danger">Cancelled</span>
-                                                @break
-                                            @default
-                                                <span class="badge badge-light">{{ ucfirst($training->status) }}</span>
+                                        @case('planned')
+                                        <span class="badge badge-secondary">Planned</span>
+                                        @break
+                                        @case('ongoing')
+                                        <span class="badge badge-warning">Ongoing</span>
+                                        @break
+                                        @case('completed')
+                                        <span class="badge badge-success">Completed</span>
+                                        @break
+                                        @case('cancelled')
+                                        <span class="badge badge-danger">Cancelled</span>
+                                        @break
+                                        @default
+                                        <span class="badge badge-light">{{ ucfirst($training->status) }}</span>
                                         @endswitch
                                     </td>
                                     <td>
-                                        <div class="btn-group" role="group">
-                                            <a href="{{ route('trainings.show', $training) }}" class="btn btn-info btn-sm">
-                                                <i class="mdi mdi-eye"></i>
+                                        <div class="action-buttons">
+                                            <a href="{{ route('trainings.show', $training) }}" class="btn btn-info" title="View Details" data-toggle="tooltip" data-placement="top">
+                                                <i class="mdi mdi-eye-outline"></i>
                                             </a>
-                                            <a href="{{ route('trainings.edit', $training) }}" class="btn btn-warning btn-sm">
-                                                <i class="mdi mdi-pencil"></i>
+                                            <a href="{{ route('trainings.edit', $training) }}" class="btn btn-warning" title="Edit" data-toggle="tooltip" data-placement="top">
+                                                <i class="mdi mdi-pencil-outline"></i>
                                             </a>
-                                            <form action="{{ route('trainings.destroy', $training) }}" method="POST" style="display: inline-block;" onsubmit="return confirm('Are you sure you want to delete this training record?')">
+                                            <form action="{{ route('trainings.destroy', $training) }}" method="POST">
                                                 @csrf
                                                 @method('DELETE')
-                                                <button type="submit" class="btn btn-danger btn-sm">
-                                                    <i class="mdi mdi-delete"></i>
+                                                <button type="submit" class="btn btn-danger" title="Delete" data-toggle="tooltip" data-placement="top" onclick="return confirm('Are you sure you want to delete this training record?')">
+                                                    <i class="mdi mdi-delete-outline"></i>
                                                 </button>
                                             </form>
                                         </div>
@@ -113,5 +113,23 @@
         </div>
     </div>
 </div>
+@endsection
 
+@section('script')
+<script>
+    $(document).ready(function() {
+        // Initialize tooltips
+        $('[data-toggle="tooltip"]').tooltip();
+
+        // Initialize DataTable
+        $('#datatable-buttons').DataTable({
+            destroy: true,
+            responsive: true,
+            pageLength: 25,
+            order: [
+                [0, 'desc']
+            ]
+        });
+    });
+</script>
 @endsection

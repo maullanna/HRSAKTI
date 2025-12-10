@@ -1,0 +1,581 @@
+.left.side-menu {
+    width: 240px;
+    background: #333547;
+    position: fixed;
+    top: 70px;
+    bottom: 0;
+    z-index: 10;
+}
+
+#sidebar-menu > ul > li > a {
+    color: #8699ad;
+    display: block;
+    padding: 12.5px 20px;
+    font-size: 15.7px;
+    font-family: "Sarabun", sans-serif;
+    transition: all 0.5s;
+}
+
+#sidebar-menu > ul > li > a:hover {
+    color: #b4c9de !important;
+    background-color: transparent !important;
+    text-decoration: none !important;
+}
+
+#sidebar-menu > ul > li > a:hover .menu-arrow,
+#sidebar-menu > ul > li > a:hover .menu-arrow i,
+#sidebar-menu > ul > li > a:hover span .menu-arrow,
+#sidebar-menu > ul > li > a:hover span .menu-arrow i {
+    display: inline-block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    transform: rotate(0deg) !important;
+}
+
+#sidebar-menu > ul > li.mm-active > a:hover .menu-arrow i,
+#sidebar-menu > ul > li.mm-active > a:hover span .menu-arrow i {
+    transform: rotate(90deg) !important;
+}
+
+#sidebar-menu > ul > li > a.mm-active {
+    color: #b4c9de;
+    background-color: #383b4e;
+}
+
+#sidebar-menu > ul > li.menu-title {
+    padding: 12px 20px;
+    letter-spacing: 1px;
+    font-size: 10px;
+    font-weight: 500;
+    text-transform: uppercase;
+    color: #b4bfcc;
+    border: none;
+    margin: 0;
+}
+
+#sidebar-menu > ul > li.menu-title:first-child {
+    padding: 12px 20px;
+    font-size: 10px;
+    font-weight: 500;
+    text-transform: uppercase;
+    color: #b4bfcc;
+    border: none;
+    margin-top: 0;
+}
+
+#sidebar-menu .submenu li a,
+#sidebar-menu ul ul li a {
+    padding: 8px 20px 8px 50px;
+    color: #8699ad;
+    display: block;
+    transition: all 0.5s;
+    background-color: transparent;
+    font-size: 15.7px;
+    font-family: "Sarabun", sans-serif;
+}
+
+#sidebar-menu .submenu li a:hover {
+    background-color: #333547;
+    color: rgba(255, 255, 255, 0.8);
+}
+
+#sidebar-menu .submenu li.mm-active > a {
+    color: #b4c9de;
+    background-color: #383b4e;
+}
+
+#sidebar-menu > ul > li > ul,
+#sidebar-menu > ul > li > .submenu,
+#sidebar-menu ul li ul,
+#sidebar-menu ul li .submenu {
+    display: none;
+    position: static !important;
+    left: auto !important;
+    right: auto !important;
+    top: auto !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    width: auto !important;
+    height: auto !important;
+}
+
+#sidebar-menu > ul > li.mm-active > ul.mm-show,
+#sidebar-menu > ul > li.mm-active > .submenu.mm-show,
+#sidebar-menu > ul > li.mm-active > ul,
+#sidebar-menu > ul > li.mm-active > .submenu {
+    display: block !important;
+    position: static !important;
+    left: auto !important;
+    right: auto !important;
+    top: auto !important;
+    margin: 0 !important;
+}
+
+#sidebar-menu li.mm-active .menu-arrow i {
+    transform: rotate(90deg) !important;
+    transition: transform 0.3s ease !important;
+}
+
+#sidebar-menu li:not(.mm-active) .menu-arrow i {
+    transform: rotate(0deg) !important;
+    transition: transform 0.3s ease !important;
+}
+
+#sidebar-menu ul li a .menu-arrow,
+#sidebar-menu > ul > li > a .menu-arrow,
+#sidebar-menu ul li a .float-right.menu-arrow,
+#sidebar-menu > ul > li > a span .menu-arrow,
+#sidebar-menu > ul > li > a span .float-right.menu-arrow,
+.enlarged #sidebar-menu .menu-arrow,
+.enlarged #wrapper #sidebar-menu .menu-arrow,
+body.enlarged #sidebar-menu .menu-arrow,
+body.enlarged #wrapper #sidebar-menu .menu-arrow {
+    display: inline-block !important;
+    float: right !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    margin-left: 5px !important;
+}
+
+#sidebar-menu ul li a .menu-arrow i,
+#sidebar-menu > ul > li > a .menu-arrow i,
+#sidebar-menu > ul > li > a span .menu-arrow i,
+#sidebar-menu > ul > li > a span .float-right.menu-arrow i,
+.enlarged #sidebar-menu .menu-arrow i,
+.enlarged #wrapper #sidebar-menu .menu-arrow i,
+body.enlarged #sidebar-menu .menu-arrow i,
+body.enlarged #wrapper #sidebar-menu .menu-arrow i {
+    display: inline-block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    font-size: 16px !important;
+    transition: transform 0.3s ease !important;
+    transform: rotate(0deg) !important;
+}
+
+.left.side-menu,
+.content-page,
+.topbar-left {
+    transition: all 0.3s ease;
+}
+
+#sidebar-menu ul li a span {
+    transition: opacity 0.3s ease;
+}
+
+@media (min-width: 769px) {
+    body.enlarged .left.side-menu {
+        width: 70px;
+        overflow: visible;
+    }
+
+    body.enlarged .content-page {
+        margin-left: 70px;
+    }
+
+    body.enlarged .topbar-left {
+        width: 70px;
+        overflow: hidden;
+    }
+
+    body.enlarged #sidebar-menu ul li a span {
+        display: none;
+    }
+
+    body.enlarged #sidebar-menu ul li a i {
+        display: inline-block;
+        margin: 0 auto;
+        text-align: center;
+    }
+
+    body.enlarged .logo-text {
+        display: none;
+    }
+
+    body.enlarged #sidebar-menu ul li:hover a span {
+        display: inline-block;
+        position: absolute;
+        left: 70px;
+        top: 0;
+        background: none;
+        color: #ffffff;
+        padding: 12px 20px;
+        white-space: nowrap;
+        z-index: 1000;
+        min-width: 150px;
+        font-weight: 700;
+        letter-spacing: 0.5px;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+        font-size: 1.1em;
+    }
+
+    body.enlarged #sidebar-menu ul li .submenu,
+    body.enlarged #sidebar-menu > ul > li > ul,
+    body.enlarged #sidebar-menu > ul > li > .submenu {
+        position: absolute !important;
+        left: 70px !important;
+        top: 0 !important;
+        background: rgba(47, 62, 71, 0.95) !important;
+        min-width: 200px !important;
+        display: none !important;
+        padding: 8px 0 !important;
+        border-radius: 6px !important;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3) !important;
+        z-index: 1001 !important;
+        margin: 0 !important;
+    }
+
+    body.enlarged #sidebar-menu ul li.submenu-show .submenu,
+    body.enlarged #sidebar-menu > ul > li.submenu-show > ul,
+    body.enlarged #sidebar-menu > ul > li.submenu-show > .submenu,
+    body.enlarged #sidebar-menu > ul > li:hover > ul,
+    body.enlarged #sidebar-menu > ul > li:hover > .submenu {
+        display: block !important;
+        position: absolute !important;
+        left: 70px !important;
+        top: 0 !important;
+    }
+
+    body.enlarged #sidebar-menu ul li .submenu li a {
+        color: #ffffff;
+        font-weight: 600;
+        padding: 10px 20px;
+        display: block;
+        transition: all 0.2s ease;
+        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+        font-size: 0.95em;
+        background: transparent;
+        border: none;
+    }
+
+    body.enlarged #sidebar-menu ul li .submenu li a:hover {
+        padding-left: 25px;
+        color: #ffffff;
+        background: rgba(255, 255, 255, 0.1);
+    }
+
+    body:not(.enlarged) .left.side-menu {
+        width: 240px;
+    }
+
+    body:not(.enlarged) .content-page {
+        margin-left: 240px;
+    }
+
+    body:not(.enlarged) .topbar-left {
+        width: 240px;
+    }
+
+    body:not(.enlarged) #sidebar-menu ul li a span {
+        display: inline-block;
+        visibility: visible;
+        opacity: 1;
+    }
+
+    body:not(.enlarged) #sidebar-menu ul li a i {
+        display: inline-block;
+        margin-right: 10px;
+    }
+
+    body:not(.enlarged) #sidebar-menu > ul > li > ul,
+    body:not(.enlarged) #sidebar-menu > ul > li > .submenu {
+        position: static !important;
+        left: auto !important;
+        right: auto !important;
+        top: auto !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        display: none;
+    }
+
+    body:not(.enlarged) #sidebar-menu > ul > li.mm-active > ul.mm-show,
+    body:not(.enlarged) #sidebar-menu > ul > li.mm-active > .submenu.mm-show,
+    body:not(.enlarged) #sidebar-menu > ul > li.mm-active > ul,
+    body:not(.enlarged) #sidebar-menu > ul > li.mm-active > .submenu {
+        display: block !important;
+        position: static !important;
+        left: auto !important;
+        right: auto !important;
+        top: auto !important;
+        margin: 0 !important;
+    }
+
+    body:not(.enlarged) #sidebar-menu > ul > li:hover > ul,
+    body:not(.enlarged) #sidebar-menu > ul > li:hover > .submenu,
+    body:not(.enlarged) #sidebar-menu ul > li:hover > ul,
+    body:not(.enlarged) #sidebar-menu ul > li:hover > .submenu {
+        position: static !important;
+        left: auto !important;
+        right: auto !important;
+        top: auto !important;
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+
+    body:not(.enlarged) .enlarged #sidebar-menu > ul > li > ul,
+    body:not(.enlarged) .enlarged #sidebar-menu > ul > li > .submenu {
+        position: static !important;
+        left: auto !important;
+    }
+}
+
+@media (max-width: 768px) {
+    .left.side-menu,
+    body .left.side-menu,
+    #wrapper .left.side-menu {
+        position: fixed !important;
+        left: -240px !important;
+        z-index: 9999 !important;
+        transition: left 0.3s ease !important;
+        box-shadow: 2px 0 10px rgba(0, 0, 0, 0.2) !important;
+        width: 240px !important;
+        background: #333547 !important;
+        top: 70px !important;
+        bottom: 0 !important;
+        margin-left: 0 !important;
+        overflow-y: auto !important;
+        overflow-x: hidden !important;
+    }
+
+    body.menu-open #sidebar-menu,
+    body.menu-open #sidebar-menu ul,
+    body.menu-open #sidebar-menu > ul {
+        display: block !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+    }
+
+    body.menu-open .left.side-menu,
+    body.menu-open body .left.side-menu,
+    body.menu-open #wrapper .left.side-menu {
+        left: 0 !important;
+        margin-left: 0 !important;
+    }
+
+    body.enlarged .left.side-menu,
+    body.enlarged body .left.side-menu,
+    body.enlarged #wrapper .left.side-menu,
+    .enlarged .left.side-menu {
+        left: -240px !important;
+        width: 240px !important;
+        margin-left: 0 !important;
+    }
+
+    body.enlarged.menu-open .left.side-menu,
+    body.enlarged.menu-open body .left.side-menu,
+    body.enlarged.menu-open #wrapper .left.side-menu {
+        left: 0 !important;
+        width: 240px !important;
+        margin-left: 0 !important;
+    }
+
+    body.menu-open #sidebar-menu > ul > li > a,
+    body.menu-open #sidebar-menu ul li a {
+        color: #8699ad !important;
+        display: block !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+        padding: 12.5px 20px !important;
+        font-size: 15.7px !important;
+        font-family: "Sarabun", sans-serif !important;
+    }
+
+    body.menu-open #sidebar-menu > ul > li > a:hover,
+    body.menu-open #sidebar-menu ul li a:hover,
+    body.menu-open #sidebar-menu > ul > li:hover > a,
+    body.menu-open #sidebar-menu ul li:hover > a {
+        color: #ffffff !important;
+        background-color: transparent !important;
+        text-decoration: none !important;
+    }
+
+    body.menu-open #sidebar-menu > ul > li > a:hover span,
+    body.menu-open #sidebar-menu ul li a:hover span,
+    body.menu-open #sidebar-menu > ul > li:hover > a span,
+    body.menu-open #sidebar-menu ul li:hover > a span {
+        color: #ffffff !important;
+    }
+
+    body.menu-open #sidebar-menu > ul > li > a:hover i,
+    body.menu-open #sidebar-menu ul li a:hover i,
+    body.menu-open #sidebar-menu > ul > li:hover > a i,
+    body.menu-open #sidebar-menu ul li:hover > a i {
+        color: #ffffff !important;
+    }
+
+    body.menu-open #sidebar-menu > ul > li > a.mm-active {
+        color: #b4c9de;
+        background-color: #383b4e;
+    }
+
+    body.menu-open #sidebar-menu > ul > li.menu-title,
+    body.menu-open #sidebar-menu ul li.menu-title,
+    body.menu-open .menu-title {
+        display: block !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+        padding: 12px 20px !important;
+        letter-spacing: 1px !important;
+        font-size: 10px !important;
+        font-weight: 500 !important;
+        text-transform: uppercase !important;
+        color: #b4bfcc !important;
+    }
+
+    body.menu-open.enlarged #sidebar-menu .menu-title,
+    body.menu-open.enlarged #wrapper #sidebar-menu .menu-title,
+    body.menu-open .enlarged #sidebar-menu .menu-title,
+    body.menu-open .enlarged #wrapper #sidebar-menu .menu-title {
+        display: block !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+    }
+
+    body.menu-open .enlarged #wrapper #sidebar-menu .menu-title,
+    body.menu-open .enlarged #wrapper #sidebar-menu .menu-arrow,
+    body.menu-open .enlarged #wrapper #sidebar-menu .badge {
+        display: block !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+    }
+
+    body.menu-open #sidebar-menu .menu-arrow {
+        display: inline-block !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+    }
+
+    body.menu-open #sidebar-menu ul li a span {
+        display: inline-block !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+    }
+
+    body.menu-open #sidebar-menu > ul > li > a > span {
+        display: inline-block !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+    }
+
+    body.menu-open #sidebar-menu ul li a i {
+        display: inline-block !important;
+        margin-right: 10px !important;
+    }
+
+    body.menu-open #sidebar-menu ul li a .menu-arrow,
+    body.menu-open #sidebar-menu > ul > li > a .menu-arrow,
+    body.menu-open #sidebar-menu ul li a .float-right.menu-arrow {
+        display: inline-block !important;
+        float: right !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+    }
+
+    body.menu-open #sidebar-menu ul li a .menu-arrow i,
+    body.menu-open #sidebar-menu > ul > li > a .menu-arrow i {
+        display: inline-block !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+        font-size: 16px !important;
+        transition: transform 0.3s ease !important;
+        transform: rotate(0deg) !important;
+    }
+
+    body.menu-open #sidebar-menu > ul > li > a .menu-arrow i {
+        display: inline-block !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+    }
+
+    body.menu-open #sidebar-menu ul li {
+        display: block !important;
+        visibility: visible !important;
+    }
+
+    body.menu-open #sidebar-menu .submenu li a,
+    body.menu-open #sidebar-menu ul ul li a {
+        padding: 8px 20px 8px 50px;
+        color: #8699ad;
+        display: block;
+        font-size: 15.7px;
+        font-family: "Sarabun", sans-serif;
+    }
+
+    body.menu-open #sidebar-menu .submenu li a:hover,
+    body.menu-open #sidebar-menu ul ul li a:hover {
+        background-color: #333547 !important;
+        color: #ffffff !important;
+    }
+
+    body.menu-open #sidebar-menu .submenu li.mm-active > a {
+        color: #b4c9de;
+        background-color: #383b4e;
+    }
+
+    body.menu-open #sidebar-menu > ul > li > ul,
+    body.menu-open #sidebar-menu ul li ul,
+    body.menu-open #sidebar-menu .submenu,
+    body.menu-open #sidebar-menu ul ul {
+        display: none !important;
+        visibility: hidden !important;
+        opacity: 0 !important;
+        max-height: 0 !important;
+        overflow: hidden !important;
+        padding: 0 !important;
+        margin: 0 !important;
+    }
+
+    body.menu-open #sidebar-menu > ul > li:not(.mm-active) > ul,
+    body.menu-open #sidebar-menu ul li:not(.mm-active) > ul,
+    body.menu-open #sidebar-menu > ul > li:not(.mm-active) > .submenu {
+        display: none !important;
+        visibility: hidden !important;
+        opacity: 0 !important;
+        max-height: 0 !important;
+        overflow: hidden !important;
+    }
+
+    body.menu-open #sidebar-menu > ul > li.mm-active > ul.mm-show,
+    body.menu-open #sidebar-menu > ul > li.mm-active > ul,
+    body.menu-open #sidebar-menu ul li.mm-active > ul.mm-show,
+    body.menu-open #sidebar-menu ul li.mm-active > ul,
+    body.menu-open #sidebar-menu > ul > li.mm-active > .submenu.mm-show,
+    body.menu-open #sidebar-menu > ul > li.mm-active > .submenu {
+        display: block !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+        max-height: none !important;
+        overflow: visible !important;
+    }
+
+    body.menu-open #sidebar-menu li.mm-active .menu-arrow i,
+    body.menu-open #sidebar-menu > ul > li.mm-active .menu-arrow i {
+        transform: rotate(90deg) !important;
+        transition: transform 0.3s ease !important;
+    }
+
+    body.menu-open #sidebar-menu li:not(.mm-active) .menu-arrow i,
+    body.menu-open #sidebar-menu > ul > li:not(.mm-active) .menu-arrow i {
+        transform: rotate(0deg) !important;
+        transition: transform 0.3s ease !important;
+    }
+
+    .content-page {
+        margin-left: 0 !important;
+        transition: margin-left 0.3s ease !important;
+    }
+
+    body.menu-open .content-page,
+    body.menu-open #wrapper .content-page,
+    body.menu-open body .content-page {
+        margin-left: 240px !important;
+        transition: margin-left 0.3s ease !important;
+    }
+
+    body:not(.menu-open) .content-page,
+    body:not(.menu-open) #wrapper .content-page,
+    body:not(.menu-open) body .content-page {
+        margin-left: 0 !important;
+        transition: margin-left 0.3s ease !important;
+    }
+}

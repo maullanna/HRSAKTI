@@ -1,19 +1,33 @@
 <?php
 
 namespace App\Models;
+
 use App\Models\Employee;
 use Illuminate\Database\Eloquent\Model;
 
 class Attendance extends Model
-
 {
+    protected $primaryKey = 'id_attendance';
+    public $incrementing = true;
+    protected $keyType = 'int';
+
+    public function getRouteKeyName()
+    {
+        return 'id_attendance';
+    }
 
     protected $table = 'attendances';
-    
+
     protected $fillable = [
-        'uid', 'emp_id', 'state', 'attendance_time', 'attendance_date', 'status', 'type'
+        'uid',
+        'emp_id',
+        'state',
+        'attendance_time',
+        'attendance_date',
+        'status',
+        'type'
     ];
-    
+
     public function employee()
     {
         return $this->belongsTo(Employee::class, 'emp_id', 'id_employees');

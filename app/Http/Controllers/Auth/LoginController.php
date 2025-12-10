@@ -10,6 +10,8 @@ use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\RateLimiter;
+use Illuminate\Validation\ValidationException;
 use RealRashid\SweetAlert\Facades\Alert;
 
 class LoginController extends Controller
@@ -42,6 +44,8 @@ class LoginController extends Controller
     public function __construct()
     {
         $this->middleware('guest')->except('logout');
+        // Gunakan middleware throttle untuk benar-benar blokir request
+        $this->middleware('throttle:login')->only('login');
     }
 
     /**
@@ -49,31 +53,25 @@ class LoginController extends Controller
      */
     public function login(Request $request)
     {
+        // Middleware throttle sudah handle blocking, kita hanya perlu reset counter saat berhasil
         $this->validateLogin($request);
-
-        // Debug: Log the request
-        \Log::info('Login attempt', [
-            'email' => $request->email,
-            'password' => $request->password,
-            'ip' => $request->ip()
-        ]);
 
         // Check if it's an admin login first
         if ($this->attemptAdminLogin($request)) {
-            \Log::info('Admin login successful');
+            // Login berhasil, reset rate limiter (gunakan key yang sama dengan middleware throttle)
+            $this->clearLoginRateLimit($request);
             return $this->sendLoginResponse($request);
         }
 
         // Check if it's an employee login
         if ($this->attemptEmployeeLogin($request)) {
-            \Log::info('Employee login successful');
+            // Login berhasil, reset rate limiter (gunakan key yang sama dengan middleware throttle)
+            $this->clearLoginRateLimit($request);
             return $this->sendEmployeeLoginResponse($request);
         }
 
-        \Log::info('Login failed for both admin and employee');
-        
-        // If neither works, increment login attempts and return failed response
-        $this->incrementLoginAttempts($request);
+        // Login gagal - counter sudah dihandle oleh middleware throttle
+        // Return failed response
         return $this->sendFailedLoginResponse($request);
     }
 
@@ -83,12 +81,12 @@ class LoginController extends Controller
     protected function attemptAdminLogin(Request $request)
     {
         $user = User::where('email', $request->email)->first();
-        
+
         if ($user && Hash::check($request->password, $user->password)) {
             Auth::guard('web')->login($user);
             return true;
         }
-        
+
         return false;
     }
 
@@ -98,22 +96,28 @@ class LoginController extends Controller
     protected function attemptEmployeeLogin(Request $request)
     {
         $employee = Employee::where('email', $request->email)->first();
-        
-        \Log::info('Employee login attempt', [
-            'email' => $request->email,
-            'employee_found' => $employee ? 'yes' : 'no',
-            'employee_id' => $employee ? $employee->id : null,
-            'pin_code_exists' => $employee ? ($employee->pin_code ? 'yes' : 'no') : 'no'
-        ]);
-        
+
         if ($employee && Hash::check($request->password, $employee->pin_code)) {
-            \Log::info('Employee password check successful');
             Auth::guard('employee')->login($employee);
             return true;
         }
-        
-        \Log::info('Employee password check failed');
+
         return false;
+    }
+
+    /**
+     * Send the response after the user was authenticated (for admin).
+     */
+    protected function sendLoginResponse(Request $request)
+    {
+        $request->session()->regenerate();
+        $this->clearLoginAttempts($request);
+
+        if ($response = $this->authenticated($request, $this->guard()->user())) {
+            return $response;
+        }
+
+        return redirect()->intended($this->redirectPath())->with('welcome', 'Selamat Datang');
     }
 
     /**
@@ -124,7 +128,7 @@ class LoginController extends Controller
         $request->session()->regenerate();
         $this->clearLoginAttempts($request);
 
-        return redirect()->intended(route('admin'))->with('success', 'Welcome back, ' . Auth::guard('employee')->user()->name . '!');
+        return redirect()->intended(route('admin'))->with('welcome', 'Selamat Datang');
     }
 
     /**
@@ -133,7 +137,28 @@ class LoginController extends Controller
     protected function sendFailedLoginResponse(Request $request)
     {
         return back()->withErrors([
-            'email' => 'The provided credentials do not match our records.',
+            'email' => 'Email atau password tidak sesuai. / The provided credentials do not match our records.',
         ])->withInput($request->only('email'));
+    }
+
+    /**
+     * Clear login rate limit untuk IP tertentu.
+     * Key harus sama dengan yang digunakan oleh middleware throttle.
+     */
+    protected function clearLoginRateLimit(Request $request)
+    {
+        // Middleware throttle menggunakan key berdasarkan rate limiter 'login'
+        // Coba beberapa format key yang mungkin digunakan
+        $ip = $request->ip();
+        $possibleKeys = [
+            'throttle:login:' . $ip,
+            'login:' . $ip,
+            'throttle:login:' . md5($ip),
+        ];
+        
+        // Clear semua kemungkinan key
+        foreach ($possibleKeys as $key) {
+            RateLimiter::clear($key);
+        }
     }
 }

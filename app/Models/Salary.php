@@ -9,9 +9,22 @@ class Salary extends Model
 {
     use HasFactory;
 
+    protected $primaryKey = 'id_salary';
+    public $incrementing = true;
+    protected $keyType = 'int';
+
+    public function getRouteKeyName()
+    {
+        return 'id_salary';
+    }
+
     protected $fillable = [
-        'employee_id', 'month', 'basic_salary', 'allowances', 
-        'deductions', 'net_salary'
+        'employee_id',
+        'month',
+        'basic_salary',
+        'allowances',
+        'deductions',
+        'net_salary'
     ];
 
     protected $casts = [
@@ -24,14 +37,6 @@ class Salary extends Model
 
     public function employee()
     {
-        return $this->belongsTo(Employee::class);
+        return $this->belongsTo(Employee::class, 'employee_id', 'id_employees');
     }
 }
-
-
-
-
-
-
-
-
