@@ -134,6 +134,13 @@ Route::group(['middleware' => ['multi.auth']], function () {
         Route::get('/reports/export/overtime', '\App\Http\Controllers\ReportController@exportOvertimeReport')->name('reports.export.overtime');
     });
 
+    // Attendance export and edit - Super Admin only
+    Route::group(['middleware' => ['Role:super_admin']], function () {
+        Route::get('/attendance/export', '\App\Http\Controllers\AttendanceController@export')->name('attendance.export');
+        Route::get('/attendance/{id}/edit', '\App\Http\Controllers\AttendanceController@edit')->name('attendance.edit');
+        Route::put('/attendance/{id}', '\App\Http\Controllers\AttendanceController@update')->name('attendance.update');
+    });
+
     // Leave routes - All authenticated users
     Route::group(['middleware' => ['Role:super_admin,admin_sdm,wadir,section,employee']], function () {
         Route::resource('/leave', '\App\Http\Controllers\LeaveController');

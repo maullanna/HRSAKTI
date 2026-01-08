@@ -224,7 +224,7 @@
                       <!-- Logout -->
                       <?php if (auth('employee')->check()): ?>
                           <li class="">
-                              <a href="<?php echo e(route('employee.logout')); ?>" class="waves-effect logout-link"
+                              <a href="javascript:void(0);" class="waves-effect logout-link"
                                   data-form-id="logout-form-employee">
                                   <i class="mdi mdi-logout"></i> <span> <?php echo e(__('global.logout')); ?> </span>
                               </a>
@@ -234,7 +234,7 @@
                           </li>
                       <?php elseif (auth('web')->check()): ?>
                           <li class="">
-                              <a href="<?php echo e(route('logout')); ?>" class="waves-effect logout-link"
+                              <a href="javascript:void(0);" class="waves-effect logout-link"
                                   data-form-id="logout-form-admin">
                                   <i class="mdi mdi-logout"></i> <span> <?php echo e(__('global.logout')); ?> </span>
                               </a>

@@ -23,6 +23,21 @@
 @section('content')
 @include('includes.flash')
 
+@php
+use Illuminate\Support\Facades\Auth;
+// Check if user is super_admin
+$user = Auth::guard('employee')->check() ? Auth::guard('employee')->user() : Auth::guard('web')->user();
+$isSuperAdmin = false;
+if ($user) {
+if (Auth::guard('employee')->check()) {
+$userRoles = $user->role ? [$user->role->slug] : ['employee'];
+} else {
+$userRoles = $user->roles()->pluck('slug')->toArray();
+}
+$isSuperAdmin = in_array('super_admin', $userRoles);
+}
+@endphp
+
 <div class="row">
     <div class="col-12">
         <div class="card">
@@ -44,9 +59,14 @@
                             <button type="submit" class="btn btn-primary mr-2 mb-2">
                                 <i class="mdi mdi-filter"></i> Filter
                             </button>
-                            <a href="{{ route('attendance') }}" class="btn btn-secondary mb-2">
+                            <a href="{{ route('attendance') }}" class="btn btn-secondary mr-2 mb-2">
                                 <i class="mdi mdi-refresh"></i> Reset
                             </a>
+                            @if($isSuperAdmin)
+                            <a href="{{ route('attendance.export', request()->query()) }}" class="btn btn-success mb-2">
+                                <i class="mdi mdi-file-export"></i> Export Excel
+                            </a>
+                            @endif
                         </form>
                     </div>
                 </div>
@@ -90,6 +110,9 @@
                                     <th data-priority="4">Attendance</th>
                                     <th data-priority="5">Time In</th>
                                     <th data-priority="6">Time Out</th>
+                                    @if($isSuperAdmin)
+                                    <th data-priority="7">Action</th>
+                                    @endif
                                 </tr>
                             </thead>
                             <tbody>
@@ -108,10 +131,19 @@
                                     </td>
                                     <td>{{ $attendance->attendance_time ?? 'N/A' }}</td>
                                     <td>{{ $attendance->time_out ?? 'N/A' }}</td>
+                                    @if($isSuperAdmin)
+                                    <td>
+                                        <a href="{{ route('attendance.edit', $attendance->id_attendance) }}"
+                                            class="btn btn-sm btn-warning"
+                                            title="Edit">
+                                            <i class="mdi mdi-pencil"></i> Edit
+                                        </a>
+                                    </td>
+                                    @endif
                                 </tr>
                                 @empty
                                 <tr>
-                                    <td colspan="6" class="text-center">No attendance records found.</td>
+                                    <td colspan="{{ $isSuperAdmin ? '7' : '6' }}" class="text-center">No attendance records found.</td>
                                 </tr>
                                 @endforelse
 

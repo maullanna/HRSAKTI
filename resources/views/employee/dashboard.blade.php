@@ -1,6 +1,6 @@
-<?php echo $__env->make('layouts.master', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?>
+@extends('layouts.master')
 
-<?php $__env->startSection('css'); ?>
+@section('css')
 <!--Chartist Chart CSS -->
 <link rel="stylesheet" href="{{ URL::asset('plugins/chartist/css/chartist.min.css') }}">
 <style>
@@ -683,9 +683,9 @@
         }
     }
 </style>
-<?php $__env->stopSection(); ?>
+@endsection
 
-<?php $__env->startSection('breadcrumb'); ?>
+@section('breadcrumb')
 <div class="col-sm-6">
     <h4 class="page-title text-left">Dashboard</h4>
     <ol class="breadcrumb">
@@ -693,419 +693,493 @@
         <li class="breadcrumb-item active">Dashboard</li>
     </ol>
 </div>
-<?php $__env->stopSection(); ?>
+@endsection
 
-<?php $__env->startSection('button'); ?>
+@section('button')
 <div class="col-sm-6">
     <div class="d-flex justify-content-end align-items-center h-100" style="flex-wrap: nowrap; min-width: 0;">
         <span class="text-muted" style="font-size: 1.1rem; white-space: nowrap; flex-shrink: 0;">
-            <?php echo e(__('global.dashboard.welcome')); ?>,
+            {{ __('global.dashboard.welcome') }},
         </span>
         <span class="ml-1" style="font-weight: 600; white-space: nowrap; display: inline-block; flex-shrink: 0;">
-            <?php echo e($employee->name); ?>
+            {{ $employee->name }}
         </span>
     </div>
 </div>
-<?php $__env->stopSection(); ?>
+@endsection
 
-<?php $__env->startSection('content'); ?>
-<?php echo $__env->make('includes.flash', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?>
+@section('content')
+<!-- TEST: Content section is loading -->
+<div class="alert alert-success">
+    <strong>✓ Content Section Loaded Successfully!</strong>
+</div>
+
+@include('includes.flash')
+
+@php
+// Debug: Check if variables are set
+$debugMode = true; // Set to true to see debug info
+@endphp
+
+
 
 <!-- Dashboard Header -->
+@if(isset($employee))
 <div class="dashboard-header">
     <div class="row align-items-center">
         <div class="col-md-8">
-            <h3>{{ $employee->name }}</h3>
-            <p><i class="mdi mdi-briefcase mr-2"></i>{{ $employee->position ?? 'N/A' }} | <i class="mdi mdi-identifier mr-2"></i>ID: {{ $employee->id_employees }}</p>
+            <h3>{{ $employee->name ?? 'N/A' }}</h3>
+            <p><i class="mdi mdi-briefcase mr-2"></i>{{ $employee->position ?? 'N/A' }} | <i class="mdi mdi-identifier mr-2"></i>ID: {{ $employee->id_employees ?? 'N/A' }}</p>
         </div>
         <div class="col-md-4 text-right">
             <p class="mb-0"><i class="mdi mdi-email mr-2"></i>{{ $employee->email ?? 'N/A' }}</p>
         </div>
     </div>
 </div>
+@else
+<div class="alert alert-danger">
+    <strong>Error:</strong> Employee data not found!
+</div>
+@endif
 
-<?php
-$isSection = isset($position) && strpos($position, 'Section ') === 0;
-$isWadir = isset($position) && in_array($position, ['Wadir 1', 'Wadir 2']);
-$isSdm = isset($position) && $position === 'SDM/HRD';
+@php
+// Ensure position is set, default to empty string if not
+$position = $position ?? '';
+$isSection = !empty($position) && strpos($position, 'Section ') === 0;
+$isWadir = !empty($position) && in_array($position, ['Wadir 1', 'Wadir 2']);
+$isSdm = !empty($position) && $position === 'SDM/HRD';
 $isRegularEmployee = !$isSection && !$isWadir && !$isSdm;
-?>
+@endphp
 
-<?php if ($isRegularEmployee): ?>
-    <!-- Today's Status - Only for regular employees, Magang, and PKL -->
-    <div class="today-status-card">
-        <div class="row align-items-center">
-            <div class="col-md-8">
-                <h5 class="mb-2">{{ __('global.dashboard.todays_attendance_status') }}</h5>
-                <?php if (isset($todayAttendance)): ?>
-                    <p class="mb-1">
-                        <span class="status-badge <?php echo e($todayAttendance->status == 1 ? 'present' : 'late'); ?>">
-                            <i class="mdi mdi-<?php echo e($todayAttendance->status == 1 ? 'check-circle' : 'clock-alert'); ?> mr-1"></i>
-                            <?php echo e($todayAttendance->status == 1 ? __('global.dashboard.present_on_time') : __('global.dashboard.present_late')); ?>
-                        </span>
-                    </p>
-                    <p class="mb-0 text-muted" style="font-size: 0.875rem;">
-                        <?php echo e(__('global.dashboard.check_in')); ?>: <?php echo e(\Carbon\Carbon::parse($todayAttendance->attendance_time)->format('H:i:s')); ?>
-                    </p>
-                <?php else: ?>
-                    <p class="mb-1">
-                        <span class="status-badge absent">
-                            <i class="mdi mdi-close-circle mr-1"></i>
-                            <?php echo e(__('global.dashboard.not_checked_in')); ?>
-                        </span>
-                    </p>
-                    <p class="mb-0 text-muted" style="font-size: 0.875rem;"><?php echo e(__('global.dashboard.please_check_in')); ?></p>
-                <?php endif; ?>
-            </div>
-            <div class="col-md-4 text-right">
-                <p class="mb-0 text-muted" style="font-size: 0.875rem;">{{ now()->format('l, F d, Y') }}</p>
-            </div>
+@if($isRegularEmployee)
+<!-- Today's Status - Only for regular employees, Magang, and PKL -->
+<div class="today-status-card">
+    <div class="row align-items-center">
+        <div class="col-md-8">
+            <h5 class="mb-2">{{ __('global.dashboard.todays_attendance_status') }}</h5>
+            @if(isset($todayAttendance))
+            <p class="mb-1">
+                <span class="status-badge {{ $todayAttendance->status == 1 ? 'present' : 'late' }}">
+                    <i class="mdi mdi-{{ $todayAttendance->status == 1 ? 'check-circle' : 'clock-alert' }} mr-1"></i>
+                    {{ $todayAttendance->status == 1 ? __('global.dashboard.present_on_time') : __('global.dashboard.present_late') }}
+                </span>
+            </p>
+            <p class="mb-0 text-muted" style="font-size: 0.875rem;">
+                {{ __('global.dashboard.check_in') }}: {{ \Carbon\Carbon::parse($todayAttendance->attendance_time)->format('H:i:s') }}
+            </p>
+            @else
+            <p class="mb-1">
+                <span class="status-badge absent">
+                    <i class="mdi mdi-close-circle mr-1"></i>
+                    {{ __('global.dashboard.not_checked_in') }}
+                </span>
+            </p>
+            <p class="mb-0 text-muted" style="font-size: 0.875rem;">{{ __('global.dashboard.please_check_in') }}</p>
+            @endif
+        </div>
+        <div class="col-md-4 text-right">
+            <p class="mb-0 text-muted" style="font-size: 0.875rem;">{{ now()->format('l, F d, Y') }}</p>
         </div>
     </div>
-<?php endif; ?>
+</div>
+@endif
 
-<?php if ($isRegularEmployee): ?>
-    <!-- Statistics - Only for regular employees, Magang, and PKL -->
-    <div class="row mb-4">
-        <div class="col-xl-3 col-md-6 col-6">
-            <div class="card mini-stat bg-primary text-white">
-                <div class="card-body">
-                    <div class="mb-4">
-                        <div class="float-left mini-stat-img mr-4">
-                            <i class="mdi mdi-calendar-check" style="font-size: 20px"></i>
-                        </div>
-                        <h5 class="font-16 text-uppercase mt-0 text-white" style="opacity: 0.8;">{{ __('global.dashboard.total_attendance') }} <br> </h5>
-                        <h4 class="font-500 text-white" style="opacity: 0.9;">{{ $totalAttendance ?? 0 }}</h4>
+@if($isRegularEmployee)
+<!-- Statistics - Only for regular employees, Magang, and PKL -->
+<div class="row mb-4">
+    <div class="col-xl-3 col-md-6 col-6">
+        <div class="card mini-stat bg-primary text-white">
+            <div class="card-body">
+                <div class="mb-4">
+                    <div class="float-left mini-stat-img mr-4">
+                        <i class="mdi mdi-calendar-check" style="font-size: 20px"></i>
                     </div>
-                    <div class="pt-2">
-                        <p class="text-white mb-0" style="opacity: 0.7;">{{ __('global.dashboard.this_month') }}</p>
-                    </div>
+                    <h5 class="font-16 text-uppercase mt-0 text-white" style="opacity: 0.8;">{{ __('global.dashboard.total_attendance') }} <br> </h5>
+                    <h4 class="font-500 text-white" style="opacity: 0.9;">{{ $totalAttendance ?? 0 }}</h4>
                 </div>
-            </div>
-        </div>
-
-        <div class="col-xl-3 col-md-6 col-6">
-            <div class="card mini-stat bg-primary text-white">
-                <div class="card-body">
-                    <div class="mb-4">
-                        <div class="float-left mini-stat-img mr-4">
-                            <i class="mdi mdi-check-circle" style="font-size: 20px"></i>
-                        </div>
-                        <h5 class="font-16 text-uppercase mt-0 text-white" style="opacity: 0.8;">{{ __('global.dashboard.on_time') }} <br> </h5>
-                        <h4 class="font-500 text-white" style="opacity: 0.9;">{{ $onTimeAttendance ?? 0 }}</h4>
-                    </div>
-                    <div class="pt-2">
-                        <p class="text-white mb-0" style="opacity: 0.7;">{{ __('global.dashboard.this_month') }}</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-xl-3 col-md-6 col-6">
-            <div class="card mini-stat bg-primary text-white">
-                <div class="card-body">
-                    <div class="mb-4">
-                        <div class="float-left mini-stat-img mr-4">
-                            <i class="mdi mdi-clock-alert" style="font-size: 20px"></i>
-                        </div>
-                        <h5 class="font-16 text-uppercase mt-0 text-white" style="opacity: 0.8;">{{ __('global.dashboard.late_arrivals') }} <br> </h5>
-                        <h4 class="font-500 text-white" style="opacity: 0.9;">{{ $lateAttendance ?? 0 }}</h4>
-                    </div>
-                    <div class="pt-2">
-                        <p class="text-white mb-0" style="opacity: 0.7;">{{ __('global.dashboard.this_month') }}</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-xl-3 col-md-6 col-6">
-            <div class="card mini-stat bg-primary text-white">
-                <div class="card-body">
-                    <div class="mb-4">
-                        <div class="float-left mini-stat-img mr-4">
-                            <i class="mdi mdi-calendar-remove" style="font-size: 20px"></i>
-                        </div>
-                        <h5 class="font-16 text-uppercase mt-0 text-white" style="opacity: 0.8;">{{ __('global.dashboard.leave_requests') }} <br> </h5>
-                        <h4 class="font-500 text-white" style="opacity: 0.9;">{{ $totalLeaves ?? 0 }}</h4>
-                    </div>
-                    <div class="pt-2">
-                        <p class="text-white mb-0" style="opacity: 0.7;">{{ __('global.dashboard.this_month') }}</p>
-                    </div>
+                <div class="pt-2">
+                    <p class="text-white mb-0" style="opacity: 0.7;">{{ __('global.dashboard.this_month') }}</p>
                 </div>
             </div>
         </div>
     </div>
 
-    <div class="row mb-4">
-        <div class="col-xl-3 col-md-6 col-6">
-            <div class="card mini-stat bg-primary text-white">
-                <div class="card-body">
-                    <div class="mb-4">
-                        <div class="float-left mini-stat-img mr-4">
-                            <i class="mdi mdi-check-circle-outline" style="font-size: 20px"></i>
-                        </div>
-                        <h5 class="font-16 text-uppercase mt-0 text-white" style="opacity: 0.8;">{{ __('global.dashboard.approved_leaves') }} <br> </h5>
-                        <h4 class="font-500 text-white" style="opacity: 0.9;">{{ $approvedLeaves ?? 0 }}</h4>
+    <div class="col-xl-3 col-md-6 col-6">
+        <div class="card mini-stat bg-primary text-white">
+            <div class="card-body">
+                <div class="mb-4">
+                    <div class="float-left mini-stat-img mr-4">
+                        <i class="mdi mdi-check-circle" style="font-size: 20px"></i>
                     </div>
-                    <div class="pt-2">
-                        <p class="text-white mb-0" style="opacity: 0.7;">{{ __('global.dashboard.this_month') }}</p>
-                    </div>
+                    <h5 class="font-16 text-uppercase mt-0 text-white" style="opacity: 0.8;">{{ __('global.dashboard.on_time') }} <br> </h5>
+                    <h4 class="font-500 text-white" style="opacity: 0.9;">{{ $onTimeAttendance ?? 0 }}</h4>
                 </div>
-            </div>
-        </div>
-
-        <div class="col-xl-3 col-md-6 col-6">
-            <div class="card mini-stat bg-primary text-white">
-                <div class="card-body">
-                    <div class="mb-4">
-                        <div class="float-left mini-stat-img mr-4">
-                            <i class="mdi mdi-clock-outline" style="font-size: 20px"></i>
-                        </div>
-                        <h5 class="font-16 text-uppercase mt-0 text-white" style="opacity: 0.8;">{{ __('global.dashboard.pending_leaves') }} <br> </h5>
-                        <h4 class="font-500 text-white" style="opacity: 0.9;">{{ $pendingLeaves ?? 0 }}</h4>
-                    </div>
-                    <div class="pt-2">
-                        <p class="text-white mb-0" style="opacity: 0.7;">{{ __('global.dashboard.awaiting_approval') }}</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-xl-3 col-md-6 col-6">
-            <div class="card mini-stat bg-primary text-white">
-                <div class="card-body">
-                    <div class="mb-4">
-                        <div class="float-left mini-stat-img mr-4">
-                            <i class="mdi mdi-clock" style="font-size: 20px"></i>
-                        </div>
-                        <h5 class="font-16 text-uppercase mt-0 text-white" style="opacity: 0.8;">+ {{ __('global.dashboard.overtime_hours') }} <br> </h5>
-                        <h4 class="font-500 text-white" style="opacity: 0.9;">{{ $totalOvertimes ?? 0 }}</h4>
-                    </div>
-                    <div class="pt-2">
-                        <p class="text-white mb-0" style="opacity: 0.7;">{{ __('global.dashboard.this_month') }}</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-xl-3 col-md-6 col-6">
-            <div class="card mini-stat bg-primary text-white">
-                <div class="card-body">
-                    <div class="mb-4">
-                        <div class="float-left mini-stat-img mr-4">
-                            <i class="mdi mdi-timer-sand" style="font-size: 20px"></i>
-                        </div>
-                        <h5 class="font-16 text-uppercase mt-0 text-white" style="opacity: 0.8;">{{ __('global.dashboard.pending_overtime') }} <br> </h5>
-                        <h4 class="font-500 text-white" style="opacity: 0.9;">{{ $pendingOvertimes ?? 0 }}</h4>
-                    </div>
-                    <div class="pt-2">
-                        <p class="text-white mb-0" style="opacity: 0.7;">{{ __('global.dashboard.awaiting_approval') }}</p>
-                    </div>
+                <div class="pt-2">
+                    <p class="text-white mb-0" style="opacity: 0.7;">{{ __('global.dashboard.this_month') }}</p>
                 </div>
             </div>
         </div>
     </div>
-<?php endif; ?>
 
-<?php
+    <div class="col-xl-3 col-md-6 col-6">
+        <div class="card mini-stat bg-primary text-white">
+            <div class="card-body">
+                <div class="mb-4">
+                    <div class="float-left mini-stat-img mr-4">
+                        <i class="mdi mdi-clock-alert" style="font-size: 20px"></i>
+                    </div>
+                    <h5 class="font-16 text-uppercase mt-0 text-white" style="opacity: 0.8;">{{ __('global.dashboard.late_arrivals') }} <br> </h5>
+                    <h4 class="font-500 text-white" style="opacity: 0.9;">{{ $lateAttendance ?? 0 }}</h4>
+                </div>
+                <div class="pt-2">
+                    <p class="text-white mb-0" style="opacity: 0.7;">{{ __('global.dashboard.this_month') }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6 col-6">
+        <div class="card mini-stat bg-primary text-white">
+            <div class="card-body">
+                <div class="mb-4">
+                    <div class="float-left mini-stat-img mr-4">
+                        <i class="mdi mdi-calendar-remove" style="font-size: 20px"></i>
+                    </div>
+                    <h5 class="font-16 text-uppercase mt-0 text-white" style="opacity: 0.8;">{{ __('global.dashboard.leave_requests') }} <br> </h5>
+                    <h4 class="font-500 text-white" style="opacity: 0.9;">{{ $totalLeaves ?? 0 }}</h4>
+                </div>
+                <div class="pt-2">
+                    <p class="text-white mb-0" style="opacity: 0.7;">{{ __('global.dashboard.this_month') }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-xl-3 col-md-6 col-6">
+        <div class="card mini-stat bg-primary text-white">
+            <div class="card-body">
+                <div class="mb-4">
+                    <div class="float-left mini-stat-img mr-4">
+                        <i class="mdi mdi-check-circle-outline" style="font-size: 20px"></i>
+                    </div>
+                    <h5 class="font-16 text-uppercase mt-0 text-white" style="opacity: 0.8;">{{ __('global.dashboard.approved_leaves') }} <br> </h5>
+                    <h4 class="font-500 text-white" style="opacity: 0.9;">{{ $approvedLeaves ?? 0 }}</h4>
+                </div>
+                <div class="pt-2">
+                    <p class="text-white mb-0" style="opacity: 0.7;">{{ __('global.dashboard.this_month') }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6 col-6">
+        <div class="card mini-stat bg-primary text-white">
+            <div class="card-body">
+                <div class="mb-4">
+                    <div class="float-left mini-stat-img mr-4">
+                        <i class="mdi mdi-clock-outline" style="font-size: 20px"></i>
+                    </div>
+                    <h5 class="font-16 text-uppercase mt-0 text-white" style="opacity: 0.8;">{{ __('global.dashboard.pending_leaves') }} <br> </h5>
+                    <h4 class="font-500 text-white" style="opacity: 0.9;">{{ $pendingLeaves ?? 0 }}</h4>
+                </div>
+                <div class="pt-2">
+                    <p class="text-white mb-0" style="opacity: 0.7;">{{ __('global.dashboard.awaiting_approval') }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6 col-6">
+        <div class="card mini-stat bg-primary text-white">
+            <div class="card-body">
+                <div class="mb-4">
+                    <div class="float-left mini-stat-img mr-4">
+                        <i class="mdi mdi-clock" style="font-size: 20px"></i>
+                    </div>
+                    <h5 class="font-16 text-uppercase mt-0 text-white" style="opacity: 0.8;">+ {{ __('global.dashboard.overtime_hours') }} <br> </h5>
+                    <h4 class="font-500 text-white" style="opacity: 0.9;">{{ $totalOvertimes ?? 0 }}</h4>
+                </div>
+                <div class="pt-2">
+                    <p class="text-white mb-0" style="opacity: 0.7;">{{ __('global.dashboard.this_month') }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6 col-6">
+        <div class="card mini-stat bg-primary text-white">
+            <div class="card-body">
+                <div class="mb-4">
+                    <div class="float-left mini-stat-img mr-4">
+                        <i class="mdi mdi-timer-sand" style="font-size: 20px"></i>
+                    </div>
+                    <h5 class="font-16 text-uppercase mt-0 text-white" style="opacity: 0.8;">{{ __('global.dashboard.pending_overtime') }} <br> </h5>
+                    <h4 class="font-500 text-white" style="opacity: 0.9;">{{ $pendingOvertimes ?? 0 }}</h4>
+                </div>
+                <div class="pt-2">
+                    <p class="text-white mb-0" style="opacity: 0.7;">{{ __('global.dashboard.awaiting_approval') }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Today's Statistics - On Time Percentage, On Time Today, Late Today -->
+<div class="row mb-4">
+    <div class="col-xl-4 col-md-6 col-6">
+        <div class="card mini-stat bg-success text-white">
+            <div class="card-body">
+                <div class="mb-4">
+                    <div class="float-left mini-stat-img mr-4">
+                        <i class="mdi mdi-chart-line" style="font-size: 20px"></i>
+                    </div>
+                    <h5 class="font-16 text-uppercase mt-0 text-white" style="opacity: 0.8;">On Time <br> Percentage</h5>
+                    <h4 class="font-500 text-white" style="opacity: 0.9;">{{ $onTimePercentage ?? 0 }}%</h4>
+                </div>
+                <div class="pt-2">
+                    <p class="text-white mb-0" style="opacity: 0.7;">More info</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-4 col-md-6 col-6">
+        <div class="card mini-stat bg-success text-white">
+            <div class="card-body">
+                <div class="mb-4">
+                    <div class="float-left mini-stat-img mr-4">
+                        <i class="mdi mdi-check-circle" style="font-size: 20px"></i>
+                    </div>
+                    <h5 class="font-16 text-uppercase mt-0 text-white" style="opacity: 0.8;">On Time <br> Today</h5>
+                    <h4 class="font-500 text-white" style="opacity: 0.9;">{{ $onTimeToday ?? 0 }}</h4>
+                </div>
+                <div class="pt-2">
+                    <p class="text-white mb-0" style="opacity: 0.7;">More info</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-4 col-md-6 col-6">
+        <div class="card mini-stat bg-danger text-white">
+            <div class="card-body">
+                <div class="mb-4">
+                    <div class="float-left mini-stat-img mr-4">
+                        <i class="mdi mdi-clock-alert" style="font-size: 20px"></i>
+                    </div>
+                    <h5 class="font-16 text-uppercase mt-0 text-white" style="opacity: 0.8;">Late <br> Today</h5>
+                    <h4 class="font-500 text-white" style="opacity: 0.9;">{{ $lateToday ?? 0 }}</h4>
+                </div>
+                <div class="pt-2">
+                    <p class="text-white mb-0" style="opacity: 0.7;">More info</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@endif
+
+@php
 // Reuse the same variables defined above
 $hasApprovalRole = $isSection || $isWadir || $isSdm;
-?>
+@endphp
 
-<?php if ($hasApprovalRole): ?>
-    <!-- Approval Statistics for Section, Wadir, SDM/HRD -->
-    <div class="row mb-4">
-        <div class="col-12">
-            <h5 class="mb-3" style="color: #333; font-weight: 600;">
-                <i class="mdi mdi-check-circle-outline mr-2"></i>Approval Dashboard
-            </h5>
-        </div>
-        <div class="col-xl-3 col-md-6 col-6">
-            <div class="card mini-stat bg-warning text-white">
-                <div class="card-body">
-                    <div class="mb-4">
-                        <div class="float-left mini-stat-img mr-4">
-                            <i class="mdi mdi-calendar-clock" style="font-size: 20px"></i>
-                        </div>
-                        <h5 class="font-16 text-uppercase mt-0 text-white" style="opacity: 0.9;">Pending Leave <br> Approvals</h5>
-                        <h4 class="font-500 text-white" style="opacity: 0.95;">{{ $pendingLeaveApprovals ?? 0 }}</h4>
+@if($hasApprovalRole)
+<!-- Approval Statistics for Section, Wadir, SDM/HRD -->
+<div class="row mb-4">
+    <div class="col-12">
+        <h5 class="mb-3" style="color: #333; font-weight: 600;">
+            <i class="mdi mdi-check-circle-outline mr-2"></i>Approval Dashboard
+        </h5>
+    </div>
+    <div class="col-xl-3 col-md-6 col-6">
+        <div class="card mini-stat bg-warning text-white">
+            <div class="card-body">
+                <div class="mb-4">
+                    <div class="float-left mini-stat-img mr-4">
+                        <i class="mdi mdi-calendar-clock" style="font-size: 20px"></i>
                     </div>
-                    <div class="pt-2">
-                        <p class="text-white mb-0" style="opacity: 0.8;">Awaiting Your Approval</p>
-                    </div>
+                    <h5 class="font-16 text-uppercase mt-0 text-white" style="opacity: 0.9;">Pending Leave <br> Approvals</h5>
+                    <h4 class="font-500 text-white" style="opacity: 0.95;">{{ $pendingLeaveApprovals ?? 0 }}</h4>
                 </div>
-            </div>
-        </div>
-
-        <div class="col-xl-3 col-md-6 col-6">
-            <div class="card mini-stat bg-warning text-white">
-                <div class="card-body">
-                    <div class="mb-4">
-                        <div class="float-left mini-stat-img mr-4">
-                            <i class="mdi mdi-clock-alert" style="font-size: 20px"></i>
-                        </div>
-                        <h5 class="font-16 text-uppercase mt-0 text-white" style="opacity: 0.9;">Pending Overtime <br> Approvals</h5>
-                        <h4 class="font-500 text-white" style="opacity: 0.95;">{{ $pendingOvertimeApprovals ?? 0 }}</h4>
-                    </div>
-                    <div class="pt-2">
-                        <p class="text-white mb-0" style="opacity: 0.8;">Awaiting Your Approval</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-xl-3 col-md-6 col-6">
-            <div class="card mini-stat bg-info text-white">
-                <div class="card-body">
-                    <div class="mb-4">
-                        <div class="float-left mini-stat-img mr-4">
-                            <i class="mdi mdi-account-check" style="font-size: 20px"></i>
-                        </div>
-                        <h5 class="font-16 text-uppercase mt-0 text-white" style="opacity: 0.9;">Your Role <br> </h5>
-                        <h4 class="font-500 text-white" style="opacity: 0.95; font-size: 18px;">
-                            <?php if ($isSection): ?>
-                                Section Head
-                            <?php elseif ($isWadir): ?>
-                                Wadir
-                            <?php elseif ($isSdm): ?>
-                                SDM/HRD
-                            <?php endif; ?>
-                        </h4>
-                    </div>
-                    <div class="pt-2">
-                        <a href="/overtime/approvals" class="text-white" style="opacity: 0.9; text-decoration: none;">
-                            <i class="mdi mdi-arrow-right mr-1"></i>View Approvals
-                        </a>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-xl-3 col-md-6 col-6">
-            <div class="card mini-stat bg-success text-white">
-                <div class="card-body">
-                    <div class="mb-4">
-                        <div class="float-left mini-stat-img mr-4">
-                            <i class="mdi mdi-file-document-check" style="font-size: 20px"></i>
-                        </div>
-                        <h5 class="font-16 text-uppercase mt-0 text-white" style="opacity: 0.9;">Total Pending <br> </h5>
-                        <h4 class="font-500 text-white" style="opacity: 0.95;">{{ ($pendingLeaveApprovals ?? 0) + ($pendingOvertimeApprovals ?? 0) }}</h4>
-                    </div>
-                    <div class="pt-2">
-                        <p class="text-white mb-0" style="opacity: 0.8;">All Approvals</p>
-                    </div>
+                <div class="pt-2">
+                    <p class="text-white mb-0" style="opacity: 0.8;">Awaiting Your Approval</p>
                 </div>
             </div>
         </div>
     </div>
-<?php endif; ?>
 
-<?php if ($isRegularEmployee): ?>
-    <!-- Recent Activities - Only for regular employees, Magang, and PKL -->
-    <div class="row">
-        <div class="col-md-4 mb-4">
-            <div class="activity-card">
-                <div class="card-header">
-                    <i class="mdi mdi-calendar-check mr-2"></i>{{ __('global.dashboard.recent_attendance') }}
+    <div class="col-xl-3 col-md-6 col-6">
+        <div class="card mini-stat bg-warning text-white">
+            <div class="card-body">
+                <div class="mb-4">
+                    <div class="float-left mini-stat-img mr-4">
+                        <i class="mdi mdi-clock-alert" style="font-size: 20px"></i>
+                    </div>
+                    <h5 class="font-16 text-uppercase mt-0 text-white" style="opacity: 0.9;">Pending Overtime <br> Approvals</h5>
+                    <h4 class="font-500 text-white" style="opacity: 0.95;">{{ $pendingOvertimeApprovals ?? 0 }}</h4>
                 </div>
-                <div class="card-body p-0">
-                    <?php if (isset($recentAttendances) && $recentAttendances->count() > 0): ?>
-                        <?php foreach ($recentAttendances as $attendance): ?>
-                            <div class="activity-item">
-                                <div class="d-flex justify-content-between align-items-start">
-                                    <div>
-                                        <div class="activity-date">
-                                            <?php echo e(\Carbon\Carbon::parse($attendance->attendance_date)->format('M d, Y')); ?>
-                                        </div>
-                                        <div class="activity-detail">
-                                            <?php echo e(\Carbon\Carbon::parse($attendance->attendance_time)->format('H:i:s')); ?>
-                                        </div>
-                                    </div>
-                                    <span class="badge-status <?php echo e($attendance->status == 1 ? 'ontime' : 'late'); ?>">
-                                        <?php echo e($attendance->status == 1 ? __('global.dashboard.on_time') : __('global.dashboard.late')); ?>
-                                    </span>
-                                </div>
-                            </div>
-                        <?php endforeach; ?>
-                    <?php else: ?>
-                        <div class="empty-state">
-                            <i class="mdi mdi-calendar-remove"></i>
-                            <p>{{ __('global.dashboard.no_attendance_records') }}</p>
-                        </div>
-                    <?php endif; ?>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-md-4 mb-4">
-            <div class="activity-card">
-                <div class="card-header">
-                    <i class="mdi mdi-calendar-remove mr-2"></i>{{ __('global.dashboard.recent_leaves') }}
-                </div>
-                <div class="card-body p-0">
-                    <?php if (isset($recentLeaves) && $recentLeaves->count() > 0): ?>
-                        <?php foreach ($recentLeaves as $leave): ?>
-                            <div class="activity-item">
-                                <div class="d-flex justify-content-between align-items-start">
-                                    <div>
-                                        <div class="activity-date">
-                                            <?php echo e(\Carbon\Carbon::parse($leave->leave_date)->format('M d, Y')); ?>
-                                        </div>
-                                        <div class="activity-detail">
-                                            <?php echo e(\Illuminate\Support\Str::limit($leave->reason ?? 'No reason', 30)); ?>
-                                        </div>
-                                    </div>
-                                    <span class="badge-status <?php echo e($leave->status); ?>">
-                                        <?php echo e(ucfirst($leave->status)); ?>
-                                    </span>
-                                </div>
-                            </div>
-                        <?php endforeach; ?>
-                    <?php else: ?>
-                        <div class="empty-state">
-                            <i class="mdi mdi-calendar-remove"></i>
-                            <p>{{ __('global.dashboard.no_leave_requests') }}</p>
-                        </div>
-                    <?php endif; ?>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-md-4 mb-4">
-            <div class="activity-card">
-                <div class="card-header">
-                    <i class="mdi mdi-clock-plus mr-2"></i>{{ __('global.dashboard.recent_overtime') }}
-                </div>
-                <div class="card-body p-0">
-                    <?php if (isset($recentOvertimes) && $recentOvertimes->count() > 0): ?>
-                        <?php foreach ($recentOvertimes as $overtime): ?>
-                            <div class="activity-item">
-                                <div class="d-flex justify-content-between align-items-start">
-                                    <div>
-                                        <div class="activity-date">
-                                            <?php echo e(\Carbon\Carbon::parse($overtime->overtime_date)->format('M d, Y')); ?>
-                                        </div>
-                                        <div class="activity-detail">
-                                            <?php echo e($overtime->duration ?? 'N/A'); ?> hours
-                                        </div>
-                                    </div>
-                                    <span class="badge-status <?php echo e($overtime->status); ?>">
-                                        <?php echo e(ucfirst($overtime->status)); ?>
-                                    </span>
-                                </div>
-                            </div>
-                        <?php endforeach; ?>
-                    <?php else: ?>
-                        <div class="empty-state">
-                            <i class="mdi mdi-clock-remove"></i>
-                            <p>{{ __('global.dashboard.no_overtime_requests') }}</p>
-                        </div>
-                    <?php endif; ?>
+                <div class="pt-2">
+                    <p class="text-white mb-0" style="opacity: 0.8;">Awaiting Your Approval</p>
                 </div>
             </div>
         </div>
     </div>
-<?php endif; ?>
+
+    <div class="col-xl-3 col-md-6 col-6">
+        <div class="card mini-stat bg-info text-white">
+            <div class="card-body">
+                <div class="mb-4">
+                    <div class="float-left mini-stat-img mr-4">
+                        <i class="mdi mdi-account-check" style="font-size: 20px"></i>
+                    </div>
+                    <h5 class="font-16 text-uppercase mt-0 text-white" style="opacity: 0.9;">Your Role <br> </h5>
+                    <h4 class="font-500 text-white" style="opacity: 0.95; font-size: 18px;">
+                        @if($isSection)
+                        Section Head
+                        @elseif($isWadir)
+                        Wadir
+                        @elseif($isSdm)
+                        SDM/HRD
+                        @endif
+                    </h4>
+                </div>
+                <div class="pt-2">
+                    <a href="/overtime/approvals" class="text-white" style="opacity: 0.9; text-decoration: none;">
+                        <i class="mdi mdi-arrow-right mr-1"></i>View Approvals
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6 col-6">
+        <div class="card mini-stat bg-success text-white">
+            <div class="card-body">
+                <div class="mb-4">
+                    <div class="float-left mini-stat-img mr-4">
+                        <i class="mdi mdi-file-document-check" style="font-size: 20px"></i>
+                    </div>
+                    <h5 class="font-16 text-uppercase mt-0 text-white" style="opacity: 0.9;">Total Pending <br> </h5>
+                    <h4 class="font-500 text-white" style="opacity: 0.95;">{{ ($pendingLeaveApprovals ?? 0) + ($pendingOvertimeApprovals ?? 0) }}</h4>
+                </div>
+                <div class="pt-2">
+                    <p class="text-white mb-0" style="opacity: 0.8;">All Approvals</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@endif
+
+@if($isRegularEmployee)
+<!-- Recent Activities - Only for regular employees, Magang, and PKL -->
+<div class="row">
+    <div class="col-md-4 mb-4">
+        <div class="activity-card">
+            <div class="card-header">
+                <i class="mdi mdi-calendar-check mr-2"></i>{{ __('global.dashboard.recent_attendance') }}
+            </div>
+            <div class="card-body p-0">
+                @if(isset($recentAttendances) && $recentAttendances->count() > 0)
+                @foreach($recentAttendances as $attendance)
+                <div class="activity-item">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <div class="activity-date">
+                                {{ \Carbon\Carbon::parse($attendance->attendance_date)->format('M d, Y') }}
+                            </div>
+                            <div class="activity-detail">
+                                {{ \Carbon\Carbon::parse($attendance->attendance_time)->format('H:i:s') }}
+                            </div>
+                        </div>
+                        <span class="badge-status {{ $attendance->status == 1 ? 'ontime' : 'late' }}">
+                            {{ $attendance->status == 1 ? __('global.dashboard.on_time') : __('global.dashboard.late') }}
+                        </span>
+                    </div>
+                </div>
+                @endforeach
+                @else
+                <div class="empty-state">
+                    <i class="mdi mdi-calendar-remove"></i>
+                    <p>{{ __('global.dashboard.no_attendance_records') }}</p>
+                </div>
+                @endif
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4 mb-4">
+        <div class="activity-card">
+            <div class="card-header">
+                <i class="mdi mdi-calendar-remove mr-2"></i>{{ __('global.dashboard.recent_leaves') }}
+            </div>
+            <div class="card-body p-0">
+                @if(isset($recentLeaves) && $recentLeaves->count() > 0)
+                @foreach($recentLeaves as $leave)
+                <div class="activity-item">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <div class="activity-date">
+                                {{ \Carbon\Carbon::parse($leave->leave_date)->format('M d, Y') }}
+                            </div>
+                            <div class="activity-detail">
+                                {{ \Illuminate\Support\Str::limit($leave->reason ?? 'No reason', 30) }}
+                            </div>
+                        </div>
+                        <span class="badge-status {{ $leave->status }}">
+                            {{ ucfirst($leave->status) }}
+                        </span>
+                    </div>
+                </div>
+                @endforeach
+                @else
+                <div class="empty-state">
+                    <i class="mdi mdi-calendar-remove"></i>
+                    <p>{{ __('global.dashboard.no_leave_requests') }}</p>
+                </div>
+                @endif
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4 mb-4">
+        <div class="activity-card">
+            <div class="card-header">
+                <i class="mdi mdi-clock-plus mr-2"></i>{{ __('global.dashboard.recent_overtime') }}
+            </div>
+            <div class="card-body p-0">
+                @if(isset($recentOvertimes) && $recentOvertimes->count() > 0)
+                @foreach($recentOvertimes as $overtime)
+                <div class="activity-item">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <div class="activity-date">
+                                {{ \Carbon\Carbon::parse($overtime->overtime_date)->format('M d, Y') }}
+                            </div>
+                            <div class="activity-detail">
+                                {{ $overtime->duration ?? 'N/A' }} hours
+                            </div>
+                        </div>
+                        <span class="badge-status {{ $overtime->status }}">
+                            {{ ucfirst($overtime->status) }}
+                        </span>
+                    </div>
+                </div>
+                @endforeach
+                @else
+                <div class="empty-state">
+                    <i class="mdi mdi-clock-remove"></i>
+                    <p>{{ __('global.dashboard.no_overtime_requests') }}</p>
+                </div>
+                @endif
+            </div>
+        </div>
+    </div>
+</div>
+@endif
 
 <!-- Training Section -->
 <div class="row mt-4">
@@ -1165,38 +1239,30 @@ $hasApprovalRole = $isSection || $isWadir || $isSdm;
                             </tr>
                         </thead>
                         <tbody>
-                            <?php $__empty_1 = true;
-                            $__currentLoopData = $employeeTrainingsThisMonth ?? [];
-                            $__env->addLoop($__currentLoopData);
-                            foreach ($__currentLoopData as $training): $__env->incrementLoopIndices();
-                                $loop = $__env->getLastLoop();
-                                $__empty_1 = false; ?>
-                                <tr>
-                                    <td><?php echo e($training->employee->name ?? 'N/A'); ?></td>
-                                    <td><?php echo e($training->title); ?></td>
-                                    <td><span class="badge badge-info"><?php echo e($training->category); ?></span></td>
-                                    <td><?php echo e(\Carbon\Carbon::parse($training->start_date)->format('M d, Y')); ?></td>
-                                    <td><?php echo e(\Carbon\Carbon::parse($training->end_date)->format('M d, Y')); ?></td>
-                                    <td>
-                                        <?php if ($training->status == 'completed'): ?>
-                                            <span class="badge badge-success"><?php echo e(__('global.dashboard.completed')); ?></span>
-                                        <?php elseif ($training->status == 'ongoing'): ?>
-                                            <span class="badge badge-warning"><?php echo e(__('global.dashboard.ongoing')); ?></span>
-                                        <?php elseif ($training->status == 'planned'): ?>
-                                            <span class="badge badge-info">Planned</span>
-                                        <?php else: ?>
-                                            <span class="badge badge-danger">Cancelled</span>
-                                        <?php endif; ?>
-                                    </td>
-                                </tr>
-                            <?php endforeach;
-                            $__env->popLoop();
-                            $loop = $__env->getLastLoop();
-                            if ($__empty_1): ?>
-                                <tr>
-                                    <td colspan="6" class="text-center"><?php echo e(__('global.dashboard.no_training_records')); ?></td>
-                                </tr>
-                            <?php endif; ?>
+                            @forelse($employeeTrainingsThisMonth ?? [] as $training)
+                            <tr>
+                                <td>{{ $training->employee->name ?? 'N/A' }}</td>
+                                <td>{{ $training->title }}</td>
+                                <td><span class="badge badge-info">{{ $training->category }}</span></td>
+                                <td>{{ \Carbon\Carbon::parse($training->start_date)->format('M d, Y') }}</td>
+                                <td>{{ \Carbon\Carbon::parse($training->end_date)->format('M d, Y') }}</td>
+                                <td>
+                                    @if($training->status == 'completed')
+                                    <span class="badge badge-success">{{ __('global.dashboard.completed') }}</span>
+                                    @elseif($training->status == 'ongoing')
+                                    <span class="badge badge-warning">{{ __('global.dashboard.ongoing') }}</span>
+                                    @elseif($training->status == 'planned')
+                                    <span class="badge badge-info">Planned</span>
+                                    @else
+                                    <span class="badge badge-danger">Cancelled</span>
+                                    @endif
+                                </td>
+                            </tr>
+                            @empty
+                            <tr>
+                                <td colspan="6" class="text-center">{{ __('global.dashboard.no_training_records') }}</td>
+                            </tr>
+                            @endforelse
                         </tbody>
                     </table>
                 </div>
@@ -1206,9 +1272,9 @@ $hasApprovalRole = $isSection || $isWadir || $isSdm;
 </div>
 <!-- end row -->
 
-<?php $__env->stopSection(); ?>
+@endsection
 
-<?php $__env->startSection('script'); ?>
+@section('script')
 <!--Chartist Chart-->
 <script src="{{ URL::asset('plugins/chartist/js/chartist.min.js') }}"></script>
 <script src="{{ URL::asset('plugins/chartist/js/chartist-plugin-tooltip.min.js') }}"></script>
@@ -1219,24 +1285,44 @@ $hasApprovalRole = $isSection || $isWadir || $isSdm;
 
     $(document).ready(function() {
         // Employee Training chart
-        var employeeTrainingChartLabels = window.employeeTrainingChartLabelsData;
-        var employeeTrainingChartData = window.employeeTrainingChartDataData;
+        var employeeTrainingChartLabels = window.employeeTrainingChartLabelsData || [];
+        var employeeTrainingChartData = window.employeeTrainingChartDataData || [];
+
+        // Ensure we have data for the chart
+        if (employeeTrainingChartLabels.length === 0) {
+            // Generate default labels for last 12 months if no data
+            for (var i = 11; i >= 0; i--) {
+                var date = new Date();
+                date.setMonth(date.getMonth() - i);
+                employeeTrainingChartLabels.push(date.toLocaleDateString('en-US', {
+                    month: 'short',
+                    year: 'numeric'
+                }));
+                employeeTrainingChartData.push(0);
+            }
+        }
 
         if (document.querySelector("#employee-training-chart")) {
-            new Chartist.Line(
-                "#employee-training-chart", {
-                    labels: employeeTrainingChartLabels,
-                    series: [employeeTrainingChartData],
-                }, {
-                    low: 0,
-                    showArea: true,
-                    plugins: [Chartist.plugins.tooltip()],
-                    lineSmooth: Chartist.Interpolation.cardinal({
-                        tension: 0.5
-                    })
-                }
-            );
+            try {
+                new Chartist.Line(
+                    "#employee-training-chart", {
+                        labels: employeeTrainingChartLabels,
+                        series: [employeeTrainingChartData],
+                    }, {
+                        low: 0,
+                        showArea: true,
+                        plugins: [Chartist.plugins.tooltip()],
+                        lineSmooth: Chartist.Interpolation.cardinal({
+                            tension: 0.5
+                        })
+                    }
+                );
+            } catch (error) {
+                console.error('Error rendering training chart:', error);
+                // Show message if chart fails to render
+                document.querySelector("#employee-training-chart").innerHTML = '<div class="text-center p-4 text-muted">No training data available</div>';
+            }
         }
     });
 </script>
-<?php $__env->stopSection(); ?>
+@endsection

@@ -163,13 +163,13 @@
                            <a class="dropdown-item" href="#"><i class="mdi mdi-lock-open-outline m-r-5"></i> Lock screen</a>
                            <div class="dropdown-divider"></div>
                            <?php if (auth('employee')->check()): ?>
-                               <a class="dropdown-item text-danger logout-link" href="<?php echo e(route('employee.logout')); ?>"
+                               <a class="dropdown-item text-danger logout-link" href="javascript:void(0);"
                                    data-form-id="logout-form-header-employee"><i class="mdi mdi-power text-danger"></i> <?php echo e(__('Logout')); ?></a>
                                <form id="logout-form-header-employee" action="<?php echo e(route('employee.logout')); ?>" method="POST" style="display: none;">
                                    <?php echo csrf_field(); ?>
                                </form>
                            <?php elseif (auth('web')->check()): ?>
-                               <a class="dropdown-item text-danger logout-link" href="<?php echo e(route('logout')); ?>"
+                               <a class="dropdown-item text-danger logout-link" href="javascript:void(0);"
                                    data-form-id="logout-form-header-admin"><i class="mdi mdi-power text-danger"></i> <?php echo e(__('Logout')); ?></a>
                                <form id="logout-form-header-admin" action="<?php echo e(route('logout')); ?>" method="POST" style="display: none;">
                                    <?php echo csrf_field(); ?>

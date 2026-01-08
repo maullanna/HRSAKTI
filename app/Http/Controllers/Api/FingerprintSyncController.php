@@ -96,11 +96,7 @@ class FingerprintSyncController extends Controller
             $attendanceDate = $attendanceDateTime->format('Y-m-d');
             $attendanceTime = $attendanceDateTime->format('H:i:s');
 
-            // Determine if this is check-in or check-out
-            // Logic: 
-            // - If no existing check-in: treat as check-in (type = 0)
-            // - If check-in exists but no check-out: treat as check-out (type = 1)
-            // - If both exist: prevent duplicate
+            // Determine if this is check-in or check-out and allow updating check-out to latest time
             $existingCheckIn = Attendance::where('attendance_date', $attendanceDate)
                 ->where('emp_id', $employee->id_employees)
                 ->where('type', 0) // 0 = check-in
@@ -111,45 +107,86 @@ class FingerprintSyncController extends Controller
                 ->where('type', 1) // 1 = check-out
                 ->first();
 
-            // Determine attendance type
             $attendanceType = 0; // Default: check-in
-            if ($existingCheckIn && !$existingCheckOut) {
-                // If check-in exists but no check-out yet, this is check-out
-                $attendanceType = 1; // Check-out
-            } elseif (!$existingCheckIn) {
-                // If no check-in exists, this is check-in
-                $attendanceType = 0; // Check-in
+
+            // If no check-in yet, this record becomes check-in
+            if (!$existingCheckIn) {
+                $attendanceType = 0;
             } else {
-                // Both exist, will be handled by duplicate check below
-                $attendanceType = 0; // Default, but will be caught as duplicate
-            }
+                // Already have check-in
+                $attendanceType = 1; // assume check-out
+                $checkInTimeCarbon = Carbon::parse($attendanceDate . ' ' . $existingCheckIn->attendance_time);
+                $incomingTimeCarbon = Carbon::parse($attendanceDate . ' ' . $attendanceTime);
 
-            // Check if this type already exists (prevent duplicate)
-            $existingAttendance = Attendance::where('attendance_date', $attendanceDate)
-                ->where('emp_id', $employee->id_employees)
-                ->where('type', $attendanceType)
-                ->first();
-
-            if ($existingAttendance) {
-                Log::info('Attendance already exists (duplicate prevented)', [
-                    'employee_code' => $employee->employee_code,
-                    'employee_id' => $employee->id_employees,
-                    'attendance_date' => $attendanceDate,
-                    'attendance_type' => $attendanceType == 0 ? 'check-in' : 'check-out',
-                    'existing_attendance_id' => $existingAttendance->id_attendance,
-                    'existing_time' => $existingAttendance->attendance_time,
-                    'new_time' => $attendanceTime
-                ]);
-                return response()->json([
-                    'success' => false,
-                    'message' => ucfirst($attendanceType == 0 ? 'check-in' : 'check-out') . ' already exists for this date',
-                    'data' => [
-                        'attendance_id' => $existingAttendance->id_attendance,
+                // If incoming time is not after check-in, reject as invalid/duplicate
+                if ($incomingTimeCarbon->lessThanOrEqualTo($checkInTimeCarbon)) {
+                    Log::info('Incoming attendance time is not after check-in, skipped', [
+                        'employee_code' => $employee->employee_code,
+                        'employee_id' => $employee->id_employees,
                         'attendance_date' => $attendanceDate,
-                        'attendance_time' => $existingAttendance->attendance_time,
-                        'type' => $attendanceType == 0 ? 'check-in' : 'check-out'
-                    ]
-                ], 409); // Conflict
+                        'check_in_time' => $existingCheckIn->attendance_time,
+                        'incoming_time' => $attendanceTime
+                    ]);
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Incoming time is not after check-in; skipped',
+                        'data' => [
+                            'attendance_date' => $attendanceDate,
+                            'check_in_time' => $existingCheckIn->attendance_time,
+                            'incoming_time' => $attendanceTime
+                        ]
+                    ], 409);
+                }
+
+                // If check-out already exists, update to the latest time if newer
+                if ($existingCheckOut) {
+                    $currentOutTime = Carbon::parse($attendanceDate . ' ' . $existingCheckOut->attendance_time);
+
+                    if ($incomingTimeCarbon->gt($currentOutTime)) {
+                        $existingCheckOut->attendance_time = $attendanceTime;
+                        $existingCheckOut->save();
+
+                        Log::info('Attendance check-out updated to latest time', [
+                            'attendance_id' => $existingCheckOut->id_attendance,
+                            'employee_id' => $employee->id_employees,
+                            'employee_code' => $employee->employee_code,
+                            'attendance_date' => $attendanceDate,
+                            'old_time_out' => $currentOutTime->format('H:i:s'),
+                            'new_time_out' => $attendanceTime
+                        ]);
+
+                        return response()->json([
+                            'success' => true,
+                            'message' => 'Check-out updated to latest time',
+                            'data' => [
+                                'attendance_id' => $existingCheckOut->id_attendance,
+                                'attendance_date' => $attendanceDate,
+                                'attendance_time' => $attendanceTime,
+                                'type' => 'check-out'
+                            ]
+                        ], 200);
+                    }
+
+                    // Incoming is earlier or same as existing check-out, skip
+                    Log::info('Check-out exists with later or equal time, incoming skipped', [
+                        'employee_code' => $employee->employee_code,
+                        'employee_id' => $employee->id_employees,
+                        'attendance_date' => $attendanceDate,
+                        'existing_time_out' => $existingCheckOut->attendance_time,
+                        'incoming_time' => $attendanceTime
+                    ]);
+
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Checkout exists with later or equal time; skipped',
+                        'data' => [
+                            'attendance_id' => $existingCheckOut->id_attendance,
+                            'attendance_date' => $attendanceDate,
+                            'existing_time_out' => $existingCheckOut->attendance_time,
+                            'incoming_time' => $attendanceTime
+                        ]
+                    ], 409);
+                }
             }
 
             // Get employee schedule to check on-time/late

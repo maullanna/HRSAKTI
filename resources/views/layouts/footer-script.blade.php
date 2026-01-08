@@ -387,13 +387,28 @@ $logoutProcessingText = __('global.logout_processing_text');
                   });
 
                   // Submit logout form
+                  if (logoutForm) {
+                     logoutForm.submit();
+                  } else {
+                     console.error('Logout form not found');
+                     window.location.href = $(this).data('logout-url') || '/employee/login';
+                  }
+               }
+            }).catch(function(error) {
+               console.error('Logout error:', error);
+               // Fallback: submit form directly
+               if (logoutForm) {
                   logoutForm.submit();
                }
             });
          } else {
             // Fallback to native confirm if SweetAlert is not available
             if (confirm(logoutText)) {
-               logoutForm.submit();
+               if (logoutForm) {
+                  logoutForm.submit();
+               } else {
+                  console.error('Logout form not found');
+               }
             }
          }
       });

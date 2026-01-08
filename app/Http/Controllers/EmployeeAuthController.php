@@ -7,6 +7,7 @@ use App\Models\Employee;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Validation\ValidationException;
 use RealRashid\SweetAlert\Facades\Alert;
@@ -55,13 +56,37 @@ class EmployeeAuthController extends Controller
      */
     public function logout(Request $request)
     {
-        Auth::guard('employee')->logout();
+        try {
+            // Logout user
+            Auth::guard('employee')->logout();
 
-        $request->session()->invalidate();
-        $request->session()->regenerateToken();
+            // Regenerate CSRF token
+            if ($request->hasSession()) {
+                $request->session()->regenerateToken();
+            }
 
-        // Flash message will be handled by redirect
-        return redirect()->route('employee.login');
+            // Invalidate and regenerate session
+            $request->session()->invalidate();
+            $request->session()->regenerate();
+
+            // Redirect to main login page
+            return redirect()->route('login')->with('success', 'You have been logged out successfully.');
+        } catch (\Exception $e) {
+            // Log error for debugging
+            Log::error('Employee logout error: ' . $e->getMessage(), [
+                'trace' => $e->getTraceAsString()
+            ]);
+
+            // Even if there's an error, try to logout and redirect
+            try {
+                Auth::guard('employee')->logout();
+            } catch (\Exception $e2) {
+                // Ignore logout errors
+            }
+
+            // Redirect to main login page without flash message
+            return redirect()->route('login');
+        }
     }
 
     /**
